@@ -325,3 +325,21 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   [data-reveal] { opacity: 1; transform: none; }
   .reveal-lines .line > span, .word > span { transform: none; }
 }
+
+/* =====================================================================
+   MOBILE HARDENING (applies to both themes)
+   ===================================================================== */
+/* Any 2-column .wrap.grid section stacks on small screens.
+   (The per-page media queries used a `.wrap > .grid` child selector that
+   never matched these `.wrap.grid` elements, so they overflowed.) */
+@media (max-width: 820px) {
+  .wrap.grid { grid-template-columns: 1fr !important; }
+}
+/* Headlines use a clip-mask reveal, so oversized type would clip instead of
+   wrap on narrow screens. Scale display/section headings down on phones. */
+@media (max-width: 600px) {
+  .display, .hero h1.display { font-size: clamp(1.55rem, 7.8vw, 3rem); }
+  .h-xl { font-size: clamp(1.45rem, 6.2vw, 2.6rem); }
+  .display, .h-xl, .h-lg { overflow-wrap: break-word; }
+  .wrap, .nav { --gut: 18px; }
+}
