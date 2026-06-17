@@ -9,23 +9,24 @@ A social-first creative agency, online in two parts:
 
 Live: **https://stanish-appalo.github.io/norml/** (pitch) · **/site** (website)
 
-## The pitch (root)
+## The pitch (root) — "Mango Drop"
 
-A single scrollable page — elegant cream/ink theme, **Bricolage Grotesque** display + **Space Mono** for data, with a mango-gold signature accent on the proof moment. No build step.
+A single scrollable page with a **cinematic, multi-mood** theme: the background shifts between warm cream, deep plum, and vivid mango-sunset gradients as you scroll. Elegant **Fraunces** serif + **Hanken Grotesk** + **Space Mono** for data. Motion is driven by **GSAP + ScrollTrigger** (loaded from CDN); content stays visible if the CDN is unavailable.
 
 ```
 index.html            # the pitch
-css/style.css         # pitch styles (scroll engine, side-nav, pop-in system)
-js/main.js            # scroll-spy nav, reveals, counters, growth chart, video
+css/style.css         # Mango Drop theme (moods, glass, gradients, grain)
+js/main.js            # GSAP reveals, parallax, growth chart, scroll-spy, video
 media/
-  mango.mp4           # the viral mango edit (web-optimized H.264)
+  mango.mp4           # the viral mango edit (60MB HEVC .MOV -> 6MB H.264)
   mango_poster.jpg    # video poster frame
+  mangoes.jpg banana.jpg play.jpg meeting.jpg   # themed photography (Unsplash)
 norml_agency_logo.jpg
 ```
 
 **Sections:** Intro · The big idea · What we do · The mango · 0 → viral · How we work · Short-form video · Social management · Content & UGC · Influencers · Websites · Let's talk. The left side-nav scroll-spies and jumps to any section.
 
-**Motion:** preloader, custom cursor, pop-in reveals (opacity + scale + blur), word stagger, number counters, a growth curve that draws on scroll, the mango in an autoplay phone mockup (tap to unmute), parallax, magnetic buttons, scroll-progress. `prefers-reduced-motion` respected.
+**Motion:** preloader, custom cursor, staggered pop-in reveals per section, scrubbed parallax on photos/blooms, number counters, a growth curve that draws on scroll, the **mango video autoplaying** in a glowing gradient frame (tap to unmute), magnetic buttons, scroll-progress, scroll-spy side-nav. `prefers-reduced-motion` respected.
 
 ## The agency site (`/site`)
 
