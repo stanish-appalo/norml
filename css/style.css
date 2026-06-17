@@ -45,9 +45,10 @@ h1,h2,h3,h4{font-family:var(--fz-display);font-weight:600;line-height:1.0;letter
 .muted{color:var(--fg-muted)}
 .grad-text{background:var(--grad-sun);-webkit-background-clip:text;background-clip:text;color:transparent}
 .grad-text--trop{background:var(--grad-trop);-webkit-background-clip:text;background-clip:text;color:transparent}
-/* On light backgrounds the gold end is illegible — use deeper, higher-contrast hues */
-.sec--light .grad-text,.sec--cream2 .grad-text,.hero .grad-text{background:linear-gradient(110deg,var(--coral),#e0218a,var(--grape))}
-.sec--light .grad-text--trop,.sec--cream2 .grad-text--trop{background:linear-gradient(110deg,#0f9e63,var(--coral),var(--grape))}
+/* On light backgrounds the gold end is illegible — use deeper, higher-contrast hues.
+   Use background-image (not the background shorthand) so background-clip:text is kept. */
+.sec--light .grad-text,.sec--cream2 .grad-text,.hero .grad-text{background-image:linear-gradient(110deg,var(--coral),#e0218a,var(--grape))}
+.sec--light .grad-text--trop,.sec--cream2 .grad-text--trop{background-image:linear-gradient(110deg,#0f9e63,var(--coral),var(--grape))}
 
 /* ---------- Section moods ---------- */
 .sec--light{--bg:var(--cream);--fg:var(--text);--fg-muted:var(--muted);--hair:var(--line)}
