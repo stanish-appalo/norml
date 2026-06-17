@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/jpeg" href="norml_agency_logo.jpg">
+<title>norml. — choose your look</title>
+<meta name="description" content="norml. — Let's Go Viral. Two versions of the site: a dark neon look and a light minimal look.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--lime:#c8ff2e}
+  html,body{height:100%}
+  body{font-family:"Inter",system-ui,sans-serif;overflow:hidden;background:#07070a;color:#fff}
+  .split{display:flex;height:100vh;width:100%}
+  .pane{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+        text-decoration:none;overflow:hidden;transition:flex .7s cubic-bezier(.16,1,.3,1)}
+  .split:hover .pane{flex:.85}
+  .split .pane:hover{flex:1.4}
+  .pane--dark{background:radial-gradient(circle at 50% 30%,#15151f,#07070a)}
+  .pane--light{background:radial-gradient(circle at 50% 30%,#fbf9f4,#ece7dd);color:#14140f}
+  .pane__logo{width:108px;height:108px;border-radius:24px;object-fit:cover;box-shadow:0 24px 70px rgba(0,0,0,.45);
+        transform:translateY(20px);opacity:0;animation:rise .9s cubic-bezier(.16,1,.3,1) forwards}
+  .pane--light .pane__logo{box-shadow:0 20px 50px rgba(0,0,0,.12);border:1px solid rgba(0,0,0,.1)}
+  .pane:nth-child(2) .pane__logo{animation-delay:.12s}
+  .pane__tag{font-family:"Space Grotesk",sans-serif;font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;
+        margin-top:34px;opacity:0;animation:rise .9s cubic-bezier(.16,1,.3,1) .25s forwards}
+  .pane--dark .pane__tag{color:#8a8a96}.pane--light .pane__tag{color:#7a776e}
+  .pane__title{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:clamp(2rem,4.5vw,3.4rem);letter-spacing:-.03em;
+        margin-top:10px;opacity:0;animation:rise .9s cubic-bezier(.16,1,.3,1) .32s forwards}
+  .pane__title b{font-weight:600;position:relative}
+  .pane--dark .pane__title b{color:var(--lime)}
+  .pane--light .pane__title b{background:linear-gradient(transparent 58%,var(--lime) 58%);padding:0 .08em}
+  .pane__cta{margin-top:30px;display:inline-flex;align-items:center;gap:10px;font-family:"Space Grotesk",sans-serif;
+        font-size:.95rem;padding:13px 24px;border-radius:999px;opacity:0;animation:rise .9s cubic-bezier(.16,1,.3,1) .4s forwards;
+        transition:gap .3s,transform .3s}
+  .pane--dark .pane__cta{background:var(--lime);color:#0a0a05}
+  .pane--light .pane__cta{background:#14140f;color:#f6f3ec}
+  .pane:hover .pane__cta{gap:16px;transform:translateY(-2px)}
+  .pane__arrow{transition:transform .3s}
+  .pane:hover .pane__arrow{transform:translate(4px,-4px)}
+  /* floating accents */
+  .blob{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none}
+  .pane--dark .blob{background:#7c5cff;width:320px;height:320px;top:-80px;right:-60px;opacity:.5;animation:float 9s ease-in-out infinite}
+  .pane--light .blob{background:#ff5c8a;width:300px;height:300px;bottom:-90px;left:-60px;opacity:.25;animation:float 11s ease-in-out infinite}
+  .brand{position:fixed;top:26px;left:0;right:0;text-align:center;z-index:5;font-family:"Space Grotesk",sans-serif;
+        font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;color:#8a8a96;mix-blend-mode:difference;
+        opacity:0;animation:fade 1s .6s forwards}
+  .hint{position:fixed;bottom:24px;left:0;right:0;text-align:center;font-size:.72rem;letter-spacing:.2em;
+        color:#8a8a96;mix-blend-mode:difference;opacity:0;animation:fade 1s .8s forwards}
+  @keyframes rise{to{transform:none;opacity:1}}
+  @keyframes fade{to{opacity:1}}
+  @keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,24px)}}
+  @media(max-width:720px){.split{flex-direction:column}.split:hover .pane,.split .pane:hover{flex:1}.pane__logo{width:84px;height:84px}}
+</style>
+</head>
+<body>
+  <div class="brand">norml. — Let's Go Viral</div>
+  <div class="split">
+    <a class="pane pane--dark" href="dark/index.html">
+      <span class="blob"></span>
+      <img src="norml_agency_logo.jpg" alt="norml." class="pane__logo">
+      <span class="pane__tag">Version 01</span>
+      <span class="pane__title">Dark <b>neon</b></span>
+      <span class="pane__cta">Enter<span class="pane__arrow">↗</span></span>
+    </a>
+    <a class="pane pane--light" href="light/index.html">
+      <span class="blob"></span>
+      <img src="norml_agency_logo.jpg" alt="norml." class="pane__logo">
+      <span class="pane__tag">Version 02</span>
+      <span class="pane__title">Light <b>minimal</b></span>
+      <span class="pane__cta">Enter<span class="pane__arrow">↗</span></span>
+    </a>
+  </div>
+  <div class="hint">Hover to preview · click to enter</div>
+</body>
+</html>

@@ -1,64 +1,45 @@
 # norml. — Let's Go Viral
 
-A multi-page marketing website for **norml.**, a social-first creative agency
-(social/viral marketing · content · branding · and web/product when a campaign needs it).
-
-The site ships in **two complete looks** — pick one, or keep the chooser:
+A social-first creative agency, online in two parts:
 
 | | |
 |---|---|
-| **`dark/`** | Bold dark theme with a lime-neon accent and heavy motion design. |
-| **`light/`** | Cream/black minimal theme matching the logo, lime used as a highlighter. |
-| **`index.html`** | A split-screen landing page that links to both versions. |
+| **`/` (root)** | **The pitch** — a scrollytelling client deck (12 sections, side-nav, premium motion) that tells the norml. story: what we do, how we do it, the **mango that went viral**, and a 0-followers → viral case study. |
+| **`/site`** | **The agency website** — a multi-page site in two complete themes (`/site/dark` neon, `/site/light` minimal) with a chooser at `/site`. |
 
-## View it
+Live: **https://stanish-appalo.github.io/norml/** (pitch) · **/site** (website)
 
-No build step — it's plain HTML/CSS/JS. Just open `index.html` in a browser
-(or `dark/index.html` / `light/index.html` directly).
+## The pitch (root)
 
-To serve locally:
-
-```bash
-# Python
-python -m http.server 8000
-# then visit http://localhost:8000
-```
-
-## Structure
+A single scrollable page — elegant cream/ink theme, **Bricolage Grotesque** display + **Space Mono** for data, with a mango-gold signature accent on the proof moment. No build step.
 
 ```
-.
-├─ index.html              # theme chooser
-├─ norml_agency_logo.jpg   # brand logo
-├─ dark/                   # Version 01 — dark + neon
-│  ├─ index.html  about.html  services.html  work.html  contact.html
-│  ├─ css/style.css
-│  └─ js/main.js
-└─ light/                  # Version 02 — light + minimal
-   ├─ index.html  about.html  services.html  work.html  contact.html
-   ├─ css/style.css        # = dark CSS + light-theme override block
-   └─ js/main.js
+index.html            # the pitch
+css/style.css         # pitch styles (scroll engine, side-nav, pop-in system)
+js/main.js            # scroll-spy nav, reveals, counters, growth chart, video
+media/
+  mango.mp4           # the viral mango edit (web-optimized H.264)
+  mango_poster.jpg    # video poster frame
+norml_agency_logo.jpg
 ```
 
-## Pages
+**Sections:** Intro · The big idea · What we do · The mango · 0 → viral · How we work · Short-form video · Social management · Content & UGC · Influencers · Websites · Let's talk. The left side-nav scroll-spies and jumps to any section.
 
-`Home` · `About` · `Services` (accordion) · `Work` (case studies) · `Contact` (form)
+**Motion:** preloader, custom cursor, pop-in reveals (opacity + scale + blur), word stagger, number counters, a growth curve that draws on scroll, the mango in an autoplay phone mockup (tap to unmute), parallax, magnetic buttons, scroll-progress. `prefers-reduced-motion` respected.
 
-## Animations
+## The agency site (`/site`)
 
-Preloader, custom cursor, scroll reveals, number counters, infinite marquees,
-parallax, 3D tilt cards, page transitions, animated nav + mobile menu, live clock.
-All vanilla JS, with a `prefers-reduced-motion` fallback.
+Built earlier — see `site/` for the dark and light multi-page versions (Home, About, Services, Work, Contact). The pitch's "Websites" section links to it as a live demo.
 
-## ⚠️ Placeholder content to replace
+## ⚠️ Placeholder content to replace before launch
 
-The following are honest, clearly-marked samples — swap in real data before launch:
+Honest, clearly-marked samples:
 
-- **Email:** `hello@norml.co`
-- **Social links:** TikTok / Instagram / YouTube currently point to `#` (LinkedIn is real)
-- **Case studies, stats, testimonials:** representative examples, not real client results
+- **Email:** `hello@norml.co`; **social links** point to `#` (LinkedIn is real)
+- **Case-study / mango stats** (views, followers, %) are representative, not real
 - **Location:** "Remote-first"
+- The source mango clip (`media/IMG_3235.MOV`, 60 MB) is git-ignored; only the optimized `mango.mp4` is committed
 
 ---
 
-*Built as a static site. Brand: norml. — Let's Go Viral.*
+*Static HTML/CSS/JS. Brand: norml. — Let's Go Viral.*

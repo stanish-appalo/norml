@@ -10,3 +10,7 @@ desktop.ini
 *.log
 _shots/
 *_tmp.html
+
+# Heavy source media (keep the optimized mango.mp4 + poster, not the 60MB original)
+media/*.MOV
+media/*.mov
