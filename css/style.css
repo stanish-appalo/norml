@@ -159,6 +159,20 @@ body.nav-open .nav-link:nth-child(12){transition-delay:.44s}
 /* ---------- Layout ---------- */
 .main{margin-left:0}
 .section{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:clamp(90px,13vh,150px) var(--gut);position:relative;overflow:hidden;background:var(--bg);color:var(--fg);transition:background .8s var(--ease),color .8s var(--ease)}
+/* every section gets a soft gradient glow background (visible at all sizes,
+   so phones don't show flat colour) — hero keeps its own mesh */
+.section.sec--light:not(.hero){background:
+  radial-gradient(78% 66% at 92% 4%,rgba(255,176,31,.24),transparent 60%),
+  radial-gradient(72% 62% at 2% 100%,rgba(255,77,109,.18),transparent 60%),var(--cream)}
+.section.sec--cream2{background:
+  radial-gradient(72% 62% at 5% 3%,rgba(22,196,127,.20),transparent 60%),
+  radial-gradient(74% 66% at 97% 98%,rgba(255,122,24,.22),transparent 60%),var(--cream-2)}
+.section.sec--dark{background:
+  radial-gradient(80% 66% at 86% 8%,rgba(255,77,109,.26),transparent 58%),
+  radial-gradient(72% 62% at 5% 96%,rgba(255,176,31,.16),transparent 58%),var(--plum)}
+.section.sec--dark2{background:
+  radial-gradient(74% 66% at 9% 7%,rgba(124,60,242,.32),transparent 58%),
+  radial-gradient(72% 62% at 95% 93%,rgba(255,77,109,.2),transparent 58%),var(--plum-2)}
 .section--auto{min-height:auto}
 .wrap{width:100%;max-width:1120px;margin-inline:auto;position:relative;z-index:2}
 .sec-no{position:absolute;top:clamp(28px,5vh,52px);right:var(--gut);font-family:var(--fz-mono);font-size:.76rem;letter-spacing:.12em;color:var(--fg-muted);opacity:.7;z-index:2}
