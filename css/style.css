@@ -92,6 +92,12 @@ h1,h2,h3,h4{font-family:var(--fz-display);font-weight:600;line-height:1.0;letter
 body.nav-open .nav-fab .arr{transform:rotate(-135deg) translate(-1px,1px)}
 
 .nav-cta{position:fixed!important;top:20px;right:20px;left:auto;z-index:790}
+@media (max-width:760px){
+  .nav-fab{top:13px;left:13px;padding:5px 13px 5px 5px;gap:8px}
+  .nav-fab img{width:27px;height:27px;border-radius:8px}
+  .nav-fab b{font-size:.92rem}
+  .nav-fab .arr{margin-left:3px}
+}
 
 .nav-scrim{position:fixed;inset:0;z-index:770;background:rgba(10,4,7,.42);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .45s var(--ease)}
 body.nav-open .nav-scrim{opacity:1;pointer-events:auto}
@@ -141,7 +147,14 @@ body.nav-open .nav-link:nth-child(12){transition-delay:.44s}
   animation:ficFloat var(--d,5s) ease-in-out var(--dl,0s) infinite;will-change:transform}
 .sec--dark .fic,.sec--dark2 .fic{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);box-shadow:0 12px 30px rgba(0,0,0,.32)}
 @keyframes ficFloat{0%,100%{transform:translateY(0) rotate(var(--r,0deg)) scale(1)}50%{transform:translateY(-15px) rotate(var(--r,0deg)) scale(1.06)}}
-@media (max-width:760px){.fic{display:none}}
+.fic--m{display:none}  /* extra mobile-only bubbles */
+@media (max-width:760px){
+  /* show one bubble per section, pinned to a bottom corner (inside the
+     section's bottom padding) so it can never overlap the content */
+  .fic{display:grid;width:40px;height:40px;font-size:.98rem;bottom:16px!important;top:auto!important}
+  .fic ~ .fic{display:none}
+  .fic--m{display:grid}
+}
 
 /* ---------- Layout ---------- */
 .main{margin-left:0}
