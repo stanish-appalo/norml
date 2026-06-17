@@ -1,7 +1,7 @@
 /* =====================================================================
    norml. PITCH — "Mango Drop" motion engine (GSAP + ScrollTrigger)
-   Content is visible by default; GSAP layers reveals on top, so if the
-   CDN fails the page still works.
+   Collapsible nav · scroll reveals · floating social pop-ins · video
+   Content is visible by default; GSAP layers motion on top.
    ===================================================================== */
 (() => {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -37,47 +37,68 @@
     document.addEventListener('mouseout',e=>{if(e.target.closest(sel))ring.classList.remove('hot');});
   }
 
-  /* ---------- Reveals + parallax (GSAP) ---------- */
+  /* ---------- Collapsible nav ---------- */
+  function nav(){
+    const fab=document.querySelector('.nav-fab'), scrim=document.querySelector('.nav-scrim');
+    if(!fab) return;
+    const close=()=>document.body.classList.remove('nav-open');
+    const toggle=()=>document.body.classList.toggle('nav-open');
+    fab.addEventListener('click',toggle);
+    scrim && scrim.addEventListener('click',close);
+    document.querySelectorAll('.nav-panel a[href^="#"]').forEach(a=>a.addEventListener('click',close));
+    addEventListener('keydown',e=>{ if(e.key==='Escape') close(); });
+  }
+
+  /* ---------- Reveals + parallax ---------- */
   function motion(){
     if(!hasGSAP || reduce) return;
-    // group reveals per section so each section's items stagger together
     document.querySelectorAll('.section:not([data-hero])').forEach(sec=>{
       const items = sec.querySelectorAll('[data-anim]');
       if(!items.length) return;
       gsap.set(items,{opacity:0,y:46,scale:.97,filter:'blur(6px)'});
-      ScrollTrigger.create({
-        trigger:sec, start:'top 72%',
-        onEnter:()=>gsap.to(items,{opacity:1,y:0,scale:1,filter:'blur(0px)',duration:.95,ease:'power3.out',stagger:.09,overwrite:true})
-      });
+      ScrollTrigger.create({trigger:sec,start:'top 72%',
+        onEnter:()=>gsap.to(items,{opacity:1,y:0,scale:1,filter:'blur(0px)',duration:.95,ease:'power3.out',stagger:.09,overwrite:true})});
     });
-    // parallax
     gsap.utils.toArray('[data-parallax]').forEach(el=>{
-      const amt = parseFloat(el.dataset.parallax)||40;
+      const amt=parseFloat(el.dataset.parallax)||40;
       gsap.fromTo(el,{y:-amt},{y:amt,ease:'none',scrollTrigger:{trigger:el.closest('.section')||el,start:'top bottom',end:'bottom top',scrub:true}});
     });
-    // hero load reveal
-    const heroItems=document.querySelectorAll('[data-hero] [data-anim]');
-    if(heroItems.length){ gsap.set(heroItems,{opacity:0,y:40,filter:'blur(6px)'}); }
+    const hero=document.querySelectorAll('[data-hero] [data-anim]');
+    if(hero.length) gsap.set(hero,{opacity:0,y:40,filter:'blur(6px)'});
   }
   function revealHero(){
     if(!hasGSAP || reduce) return;
-    const heroItems=document.querySelectorAll('[data-hero] [data-anim]');
-    gsap.to(heroItems,{opacity:1,y:0,filter:'blur(0px)',duration:1,ease:'power3.out',stagger:.1});
+    gsap.to(document.querySelectorAll('[data-hero] [data-anim]'),{opacity:1,y:0,filter:'blur(0px)',duration:1,ease:'power3.out',stagger:.1});
+  }
+
+  /* ---------- Floating social pop-ins ---------- */
+  function stickers(){
+    const els=document.querySelectorAll('.sticker');
+    if(!els.length) return;
+    if(!hasGSAP || reduce) return;            // visible & static if GSAP absent
+    els.forEach((el,i)=>{
+      const rot=(parseFloat(el.dataset.rot)||0);
+      gsap.set(el,{opacity:0,scale:0,rotation:rot-18});
+      ScrollTrigger.create({trigger:el.closest('.section')||el,start:'top 78%',
+        onEnter:()=>{
+          gsap.to(el,{opacity:1,scale:1,rotation:rot,duration:.7,ease:'back.out(2)',delay:(i%4)*.08,
+            onComplete:()=>gsap.to(el,{y:'-=12',rotation:rot+2,duration:2.6+(i%3)*.4,ease:'sine.inOut',yoyo:true,repeat:-1})});
+        }});
+    });
   }
 
   /* ---------- Counters ---------- */
   function counters(){
     document.querySelectorAll('[data-count]').forEach(el=>{
       const target=parseFloat(el.dataset.count), dec=(el.dataset.count.split('.')[1]||'').length;
-      const run=()=>{ const o={v:0}; const t0=performance.now(), dur=1700;
-        (function step(now){ const k=Math.min((now-t0)/dur,1), e=1-Math.pow(1-k,3); el.textContent=(target*e).toFixed(dec); if(k<1)requestAnimationFrame(step); else el.textContent=target.toFixed(dec); })(t0);
-      };
+      const run=()=>{ const t0=performance.now(), dur=1700;
+        (function step(now){ const k=Math.min((now-t0)/dur,1), e=1-Math.pow(1-k,3); el.textContent=(target*e).toFixed(dec); if(k<1)requestAnimationFrame(step); else el.textContent=target.toFixed(dec); })(t0); };
       if(hasGSAP){ ScrollTrigger.create({trigger:el,start:'top 88%',once:true,onEnter:run}); }
       else { new IntersectionObserver((en,o)=>{en.forEach(x=>{if(x.isIntersecting){run();o.disconnect();}});},{threshold:.6}).observe(el); }
     });
   }
 
-  /* ---------- Growth chart draw ---------- */
+  /* ---------- Growth chart ---------- */
   function chart(){
     const path=document.querySelector('.chart path.line'); if(!path) return;
     const len=path.getTotalLength();
@@ -97,9 +118,8 @@
     const map=new Map(); links.forEach(l=>{const s=document.getElementById(l.getAttribute('href').slice(1));if(s)map.set(s,l);});
     if(!map.size) return;
     const set=l=>{links.forEach(x=>x.classList.remove('active'));l&&l.classList.add('active');};
-    if(hasGSAP){ map.forEach((l,s)=>ScrollTrigger.create({trigger:s,start:'top 50%',end:'bottom 50%',onToggle:e=>{if(e.isActive)set(l);}})); }
-    else { new IntersectionObserver(en=>en.forEach(e=>{if(e.isIntersecting)set(map.get(e.target));}),{rootMargin:'-45% 0px -45% 0px'}).forEach?0:0;
-      const io=new IntersectionObserver(en=>en.forEach(e=>{if(e.isIntersecting)set(map.get(e.target));}),{rootMargin:'-45% 0px -45% 0px'}); map.forEach((l,s)=>io.observe(s)); }
+    const io=new IntersectionObserver(en=>en.forEach(e=>{if(e.isIntersecting)set(map.get(e.target));}),{rootMargin:'-45% 0px -45% 0px'});
+    map.forEach((l,s)=>io.observe(s));
   }
 
   /* ---------- Video: autoplay + sound ---------- */
@@ -113,25 +133,15 @@
     if(btn) btn.addEventListener('click',()=>{ v.muted=!v.muted; btn.textContent=v.muted?'🔇':'🔊'; if(!v.muted)tryPlay(); });
   }
 
-  /* ---------- Progress ---------- */
+  /* ---------- Progress / magnetic / anchors ---------- */
   function progress(){ const bar=document.querySelector('.progress'); if(!bar)return;
     addEventListener('scroll',()=>{const h=document.documentElement.scrollHeight-innerHeight;bar.style.transform=`scaleX(${h>0?scrollY/h:0})`;},{passive:true}); }
-
-  /* ---------- Magnetic ---------- */
   function magnetic(){ if(touch)return;
     document.querySelectorAll('[data-mag]').forEach(el=>{
       el.addEventListener('mousemove',e=>{const r=el.getBoundingClientRect();el.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.3}px,${(e.clientY-r.top-r.height/2)*.4}px)`;});
       el.addEventListener('mouseleave',()=>el.style.transform='');
     });
   }
-
-  /* ---------- Mobile drawer ---------- */
-  function drawer(){ const b=document.querySelector('.topbar__burger'); if(!b)return;
-    b.addEventListener('click',()=>document.body.classList.toggle('menu'));
-    document.querySelectorAll('.rail a[href^="#"]').forEach(a=>a.addEventListener('click',()=>document.body.classList.remove('menu')));
-  }
-
-  /* ---------- Anchor smooth scroll ---------- */
   function anchors(){
     document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{
       const id=a.getAttribute('href'); if(id.length<2)return; const t=document.querySelector(id); if(!t)return;
@@ -140,7 +150,7 @@
   }
 
   document.addEventListener('DOMContentLoaded',()=>{
-    cursor(); motion(); counters(); chart(); spy(); video(); progress(); magnetic(); drawer(); anchors();
+    cursor(); nav(); motion(); stickers(); counters(); chart(); spy(); video(); progress(); magnetic(); anchors();
     preloader(()=>{ revealHero(); if(hasGSAP) ScrollTrigger.refresh(); });
   });
 })();
