@@ -86,12 +86,8 @@ h1,h2,h3,h4{font-family:var(--fz-display);font-weight:600;line-height:1.0;letter
 .nav-fab:hover{transform:translateY(-2px)}
 .nav-fab img{width:34px;height:34px;border-radius:9px;flex-shrink:0}
 .nav-fab b{font-family:var(--fz-display);font-weight:600;font-size:1.1rem}
-.nav-fab .arr{width:20px;height:20px;position:relative;flex-shrink:0;margin-left:2px}
-.nav-fab .arr::before,.nav-fab .arr::after{content:"";position:absolute;width:9px;height:2px;background:currentColor;border-radius:2px;left:5px;transition:transform .4s var(--ease)}
-.nav-fab .arr::before{top:8px;transform:rotate(45deg) translateX(0)}
-.nav-fab .arr::after{top:8px;transform:rotate(-45deg) translateX(6px)}
-body.nav-open .nav-fab .arr::before{transform:rotate(-45deg)}
-body.nav-open .nav-fab .arr::after{transform:rotate(45deg) translateX(6px)}
+.nav-fab .arr{width:8px;height:8px;flex-shrink:0;margin-left:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;border-radius:1px;transform:rotate(45deg) translate(-1px,-2px);transition:transform .4s var(--ease)}
+body.nav-open .nav-fab .arr{transform:rotate(-135deg) translate(-1px,1px)}
 
 .nav-cta{position:fixed!important;top:20px;right:20px;left:auto;z-index:790}
 
