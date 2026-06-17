@@ -130,6 +130,10 @@ body.nav-open .nav-link:nth-child(12){transition-delay:.44s}
 .sticker b{font-family:var(--fz-mono);font-weight:700}
 @media (max-width:760px){.sticker{display:none}}
 
+/* ---------- Reaction burst (Instagram-style) ---------- */
+.reactions{position:absolute;left:0;right:0;bottom:0;height:0;z-index:6;pointer-events:none}
+.rx{position:absolute;bottom:12px;line-height:1;will-change:transform,opacity;filter:drop-shadow(0 6px 14px rgba(60,20,10,.28))}
+
 /* ---------- Layout ---------- */
 .main{margin-left:0}
 .section{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:clamp(90px,13vh,150px) var(--gut);position:relative;overflow:hidden;background:var(--bg);color:var(--fg);transition:background .8s var(--ease),color .8s var(--ease)}

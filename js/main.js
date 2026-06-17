@@ -149,8 +149,44 @@
     }));
   }
 
+  /* ---------- Reaction burst (Instagram-style) ---------- */
+  function reactions(){
+    if(reduce) return;
+    const sec=document.getElementById('contact'); if(!sec) return;
+    const host=document.createElement('div'); host.className='reactions'; sec.appendChild(host);
+    const emojis=['❤️','🔥','🥭','😍','👏','✨','💯','🙌','⭐','🚀'];
+    function one(){
+      const s=document.createElement('span'); s.className='rx';
+      s.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+      s.style.left=(38+Math.random()*24)+'%';
+      s.style.fontSize=(1.1+Math.random()*1.7)+'rem';
+      host.appendChild(s);
+      const dx=(Math.random()-.5)*300, dy=-(240+Math.random()*360), rot=(Math.random()-.5)*70, dur=1.7+Math.random()*1.5;
+      if(hasGSAP){
+        gsap.fromTo(s,{y:0,x:0,opacity:0,scale:.3},{opacity:1,scale:1,duration:.22,ease:'back.out(2)'});
+        gsap.to(s,{y:dy,x:dx,rotation:rot,opacity:0,scale:.6+Math.random()*.5,duration:dur,ease:'power1.out',onComplete:()=>s.remove()});
+      } else {
+        s.style.transition='transform '+dur+'s ease-out, opacity '+dur+'s ease-out';
+        requestAnimationFrame(()=>{s.style.transform='translate('+dx+'px,'+dy+'px) rotate('+rot+'deg)';s.style.opacity='0';});
+        setTimeout(()=>s.remove(),dur*1000+120);
+      }
+    }
+    function burst(n){ for(let i=0;i<n;i++) setTimeout(one, i*45); }
+    const celebrate=()=>{ burst(18); setTimeout(()=>burst(10),700); setTimeout(()=>burst(8),1500); };
+    if(hasGSAP){
+      ScrollTrigger.create({trigger:sec,start:'top 65%',onEnter:celebrate,onEnterBack:celebrate});
+    } else {
+      let seen=false;
+      new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting && !seen){ seen=true; celebrate(); } else if(!e.isIntersecting){ seen=false; } }),{threshold:.3}).observe(sec);
+    }
+    sec.querySelectorAll('a[href^="mailto"], .cta__big a').forEach(a=>{
+      a.addEventListener('mouseenter',()=>burst(8));
+      a.addEventListener('click',()=>burst(16));
+    });
+  }
+
   document.addEventListener('DOMContentLoaded',()=>{
-    cursor(); nav(); motion(); stickers(); counters(); chart(); spy(); video(); progress(); magnetic(); anchors();
+    cursor(); nav(); motion(); stickers(); counters(); chart(); spy(); video(); progress(); magnetic(); anchors(); reactions();
     preloader(()=>{ revealHero(); if(hasGSAP) ScrollTrigger.refresh(); });
   });
 })();
