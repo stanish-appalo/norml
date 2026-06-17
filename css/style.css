@@ -164,7 +164,15 @@ body.nav-open .nav-link:nth-child(12){transition-delay:.44s}
 .card .ic{font-size:1.7rem;line-height:1}
 
 /* ---------- Hero ---------- */
-.hero{justify-content:center}
+.hero{justify-content:center;background:linear-gradient(165deg,#fff9f1,#ffeede 55%,#ffe2cd)}
+.hero::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(135% 100% at 50% 14%,transparent 50%,rgba(60,22,18,.12))}
+.herobg{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.hb{position:absolute;border-radius:50%;filter:blur(100px);opacity:.5;will-change:transform}
+.hb--1{width:48vw;height:48vw;left:-10%;top:-14%;background:conic-gradient(from 90deg,var(--mango),var(--tangerine),var(--coral),var(--mango));animation:drift1 20s ease-in-out infinite}
+.hb--2{width:44vw;height:44vw;right:-12%;bottom:-16%;opacity:.42;background:conic-gradient(from 200deg,var(--leaf),var(--mango),var(--coral),var(--leaf));animation:drift2 26s ease-in-out infinite}
+.hb--3{width:32vw;height:32vw;right:12%;top:6%;opacity:.32;background:conic-gradient(from 0deg,var(--coral),var(--grape),var(--mango),var(--coral));animation:drift2 23s ease-in-out infinite reverse}
+@keyframes drift1{0%,100%{transform:translate(0,0) rotate(0deg) scale(1)}50%{transform:translate(5%,7%) rotate(55deg) scale(1.08)}}
+@keyframes drift2{0%,100%{transform:translate(0,0) rotate(0deg) scale(1)}50%{transform:translate(-6%,-5%) rotate(-65deg) scale(1.1)}}
 .hero__media{position:absolute;inset:0;z-index:0;overflow:hidden}
 .hero__photo{position:absolute;right:-6%;top:50%;transform:translateY(-50%);width:min(56%,700px);height:120%;object-fit:cover;
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 60%);mask-image:linear-gradient(90deg,transparent,#000 60%);opacity:.85}
