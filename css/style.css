@@ -89,7 +89,7 @@ h1,h2,h3,h4{font-family:var(--fz-display);font-weight:600;line-height:1.0;letter
 body.nav-open .nav-fab .arr::before{transform:rotate(-45deg)}
 body.nav-open .nav-fab .arr::after{transform:rotate(45deg) translateX(6px)}
 
-.nav-cta{position:fixed;top:20px;right:20px;z-index:790}
+.nav-cta{position:fixed!important;top:20px;right:20px;left:auto;z-index:790}
 
 .nav-scrim{position:fixed;inset:0;z-index:770;background:rgba(10,4,7,.42);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .45s var(--ease)}
 body.nav-open .nav-scrim{opacity:1;pointer-events:auto}
