@@ -130,10 +130,10 @@
     let scrollAmp=0;
     addEventListener('scroll',()=>{
       scrollAmp = Math.min(scrollY/innerHeight,1);
-      // carry the jelly into slide 2: blur, fade & sink as you scroll down
-      const p = Math.min(Math.max((scrollY - innerHeight*0.5)/(innerHeight*0.72),0),1);
-      canvas.style.filter = p>0.002 ? 'blur('+(p*26).toFixed(1)+'px)' : 'none';
-      canvas.style.opacity = (1 - p*0.78).toFixed(3);
+      // carry the jelly into slide 2 ONLY: blur, fully fade & sink across the hero->about seam
+      const p = Math.min(Math.max((scrollY - innerHeight*0.45)/(innerHeight*0.6),0),1);
+      canvas.style.filter = p>0.002 ? 'blur('+(p*28).toFixed(1)+'px)' : 'none';
+      canvas.style.opacity = (1 - p).toFixed(3);
     }, {passive:true});
 
     function resize(){ cam.aspect=innerWidth/innerHeight; cam.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); place(); }
@@ -284,18 +284,23 @@
     const T=window.THREE, host=cv.parentElement;
     const renderer=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
     renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+    if(T.sRGBEncoding) renderer.outputEncoding=T.sRGBEncoding;
+    if(T.ACESFilmicToneMapping){ renderer.toneMapping=T.ACESFilmicToneMapping; renderer.toneMappingExposure=1.08; }
     const scene=new T.Scene();
     const cam=new T.PerspectiveCamera(34,1,0.1,100); cam.position.set(0,0,6.2);
-    scene.add(new T.AmbientLight(0xfff4ec,0.65));
-    const key=new T.DirectionalLight(0xffffff,1.15); key.position.set(3,4,5); scene.add(key);
-    const warm=new T.DirectionalLight(0xff7a3c,0.85); warm.position.set(-4,-1,2); scene.add(warm);
-    const cool=new T.DirectionalLight(0x9c7bff,0.5); cool.position.set(-2,3,-4); scene.add(cool);
+    // studio environment -> real reflections so the marble pops
+    try{ if(T.RoomEnvironment){ const pmrem=new T.PMREMGenerator(renderer); scene.environment=pmrem.fromScene(new T.RoomEnvironment(),0.04).texture; } }catch(e){}
+    scene.add(new T.AmbientLight(0xfff4ec,0.4));
+    const key=new T.DirectionalLight(0xffffff,1.6); key.position.set(3,5,5); scene.add(key);
+    const warm=new T.DirectionalLight(0xff7a3c,1.0); warm.position.set(-5,-1,2); scene.add(warm);
+    const cool=new T.DirectionalLight(0x9c7bff,0.7); cool.position.set(-2,3,-5); scene.add(cool);
+    const rim=new T.DirectionalLight(0xffffff,1.1); rim.position.set(0,2,-6); scene.add(rim);
     const group=new T.Group(); scene.add(group);
     const uBreak={value:0}; let mesh=null, breakT=-1, running=false;
     let rotY=0,rotX=0,tRY=0,tRX=0,drag=false,lx=0,ly=0,moved=0,auto=true;
 
     function mat(){
-      const m=new T.MeshStandardMaterial({color:0xf3efe6,roughness:0.34,metalness:0.16});
+      const m=new T.MeshStandardMaterial({color:0xf6f1e8,roughness:0.28,metalness:0.26,envMapIntensity:1.1});
       m.onBeforeCompile=sh=>{
         sh.uniforms.uBreak=uBreak;
         sh.vertexShader='uniform float uBreak;\nattribute vec3 aDir;\nattribute float aRnd;\n'+sh.vertexShader;
@@ -347,11 +352,14 @@
 
     function resize(){ const r=host.getBoundingClientRect(); if(!r.width)return; renderer.setSize(r.width,r.height,false); cam.aspect=r.width/r.height; cam.updateProjectionMatrix(); }
     addEventListener('resize',resize);
+    let tt=0;
     function loop(){
       if(!running) return;
+      tt+=0.016;
       if(auto) tRY+=0.0035;
       rotY+=(tRY-rotY)*0.08; rotX+=(tRX-rotX)*0.08;
       group.rotation.set(rotX,rotY,0);
+      group.position.y=Math.sin(tt*0.8)*0.05;  // gentle float
       if(breakT>=0){ breakT+=0.016; const p=breakT; let v;
         if(p<0.5) v=p/0.5; else if(p<1.0) v=1; else if(p<1.9) v=1-(p-1.0)/0.9; else {v=0;breakT=-1;}
         uBreak.value=v*v*(3-2*v);
