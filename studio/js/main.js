@@ -306,9 +306,9 @@
     }
     function prep(geo){
       geo=geo.toNonIndexed(); geo.center();
-      geo.computeBoundingSphere(); const R=(geo.boundingSphere&&geo.boundingSphere.radius)||1;
+      geo.computeBoundingBox(); const H=(geo.boundingBox.max.y-geo.boundingBox.min.y)||1;
       const pos=geo.attributes.position, n=pos.count;
-      for(let i=0;i<n;i++) pos.setXYZ(i,pos.getX(i)/R,pos.getY(i)/R,pos.getZ(i)/R);
+      for(let i=0;i<n;i++) pos.setXYZ(i,pos.getX(i)/H,pos.getY(i)/H,pos.getZ(i)/H);
       pos.needsUpdate=true;
       if(!geo.attributes.normal) geo.computeVertexNormals();
       const dir=new Float32Array(n*3), rnd=new Float32Array(n);
@@ -323,13 +323,19 @@
       geo.setAttribute('aRnd',new T.BufferAttribute(rnd,1));
       return geo;
     }
-    function add(geo){ mesh=new T.Mesh(prep(geo),mat()); mesh.scale.setScalar(2.2); mesh.position.y=-0.15; group.add(mesh); }
+    function add(geo){ mesh=new T.Mesh(prep(geo),mat()); mesh.scale.setScalar(2.9); mesh.position.y=0; group.add(mesh); }
     function fallback(){ add(new T.IcosahedronGeometry(1,1)); }
-
-    if(T.GLTFLoader){
+    function mergeScene(scn){
+      const gs=[]; scn.updateMatrixWorld(true);
+      scn.traverse(o=>{ if(o.isMesh&&o.geometry){ let gg=o.geometry.clone(); gg.applyMatrix4(o.matrixWorld); gg=gg.toNonIndexed(); if(!gg.attributes.normal) gg.computeVertexNormals();
+        const ng=new T.BufferGeometry(); ng.setAttribute('position',gg.attributes.position.clone()); ng.setAttribute('normal',gg.attributes.normal.clone()); gs.push(ng); } });
+      if(!gs.length) return null;
+      return (gs.length>1 && T.BufferGeometryUtils) ? T.BufferGeometryUtils.mergeBufferGeometries(gs,false) : gs[0];
+    }
+    if(T.GLTFLoader && window.__STATUE){
       try{
-        new T.GLTFLoader().load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/models/gltf/LeePerrySmith/LeePerrySmith.glb',
-          g=>{ let geo=null; g.scene.traverse(o=>{if(o.isMesh&&!geo)geo=o.geometry;}); geo?add(geo):fallback(); },
+        new T.GLTFLoader().load(window.__STATUE,
+          g=>{ const geo=mergeScene(g.scene); geo?add(geo):fallback(); },
           undefined, ()=>fallback());
       }catch(e){ fallback(); }
     } else fallback();
