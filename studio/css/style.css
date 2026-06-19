@@ -51,7 +51,7 @@ h1,h2,h3,h4{font-family:var(--fdisp);font-weight:600;line-height:.98;letter-spac
 
 /* ---------- Cursor ---------- */
 .cur{position:fixed;top:0;left:0;width:12px;height:12px;border-radius:50%;background:var(--ink);z-index:9999;pointer-events:none;transform:translate(-50%,-50%);transition:width .3s var(--ease),height .3s var(--ease),background .3s,opacity .3s;mix-blend-mode:difference}
-.cur.big{width:70px;height:70px;background:var(--lime)}
+.cur.big{width:36px;height:36px;background:var(--lime)}
 .cur.lbl::after{content:attr(data-l);position:absolute;inset:0;display:grid;place-items:center;font:600 10px var(--fmono);letter-spacing:.05em;color:var(--ink);text-transform:uppercase}
 @media (max-width:900px){.cur{display:none}}
 
@@ -89,12 +89,12 @@ main{position:relative;z-index:1}
 /* ---------- Selected work: glass floating in a void ---------- */
 .void{
   background:
-    radial-gradient(820px 560px at 14% 8%, rgba(255,106,43,.13), transparent 60%),
-    radial-gradient(760px 680px at 88% 86%, rgba(140,110,255,.13), transparent 62%),
-    radial-gradient(1100px 900px at 50% 40%, #18171d, #0b0a0e 72%),
-    #08070b;
+    radial-gradient(780px 540px at 14% 8%, rgba(255,106,43,.13), transparent 60%),
+    radial-gradient(720px 660px at 88% 88%, rgba(140,110,255,.12), transparent 62%),
+    radial-gradient(1100px 900px at 50% 36%, #0f0e13, #040308 70%),
+    #010103;
   color:#fff;position:relative;overflow:hidden;isolation:isolate}
-.void::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+.void::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.4;
   background-image:radial-gradient(rgba(255,255,255,.5) .8px, transparent .9px);background-size:46px 46px}
 .void__orb{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:-1}
 .void__orb--1{width:420px;height:420px;background:radial-gradient(circle,rgba(255,106,43,.4),transparent 70%);top:4%;left:-7%}
@@ -103,13 +103,14 @@ main{position:relative;z-index:1}
 .void .meta{color:rgba(255,255,255,.5)}
 .void .work-num{color:var(--warm)}
 .void .work-item{
-  border:1px solid rgba(255,255,255,.14);border-top:1px solid rgba(255,255,255,.14);border-bottom:none;
-  background:linear-gradient(150deg,rgba(255,255,255,.09),rgba(255,255,255,.03));
-  -webkit-backdrop-filter:blur(20px) saturate(1.3);backdrop-filter:blur(20px) saturate(1.3);
+  border:1px solid rgba(255,255,255,.18);border-top:1px solid rgba(255,255,255,.22);border-bottom:none;
+  background:linear-gradient(150deg,rgba(255,255,255,.12),rgba(255,255,255,.035));
+  -webkit-backdrop-filter:blur(22px) saturate(1.3);backdrop-filter:blur(22px) saturate(1.3);
   border-radius:26px;padding:clamp(20px,3vw,42px);position:relative;z-index:1;
   max-width:1100px;margin:0 auto clamp(28px,5vw,56px);
-  box-shadow:0 40px 90px -20px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.22);
-  transition:transform .6s var(--ease),box-shadow .6s var(--ease)}
+  box-shadow:0 60px 120px -26px rgba(0,0,0,.9),0 12px 34px -10px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.28);
+  transition:box-shadow .6s var(--ease);animation:floatcard 11s ease-in-out infinite}
+.void .work-item:nth-child(even){animation-delay:-5.5s}
 .void .work-item:last-child{margin-bottom:0;border-bottom:none}
 
 /* ---------- Real 3D: mouse tilt + depth layers (client wants 3D) ---------- */
@@ -131,17 +132,12 @@ main{position:relative;z-index:1}
 #proof .proof>div{background:linear-gradient(150deg,rgba(20,19,15,.045),rgba(20,19,15,.012));border:1px solid var(--line);border-radius:20px;padding:clamp(22px,2.6vw,38px)}
 #proof .chart{overflow:visible}
 
-/* ---------- Floating 3D coin stack — "currency that compounds" ---------- */
-.coin3d{position:absolute;top:7%;right:4%;width:min(32vw,400px);aspect-ratio:1;perspective:1200px;z-index:0;pointer-events:none}
-.coin3d__tilt{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(60deg)}
-.coin3d__spin{position:absolute;inset:0;transform-style:preserve-3d;animation:coinspin 18s linear infinite}
-.coin3d i{position:absolute;inset:26%;border-radius:50%;border:1.5px solid rgba(255,106,43,.55);
-  background:radial-gradient(circle at 36% 30%,rgba(255,185,135,.45),rgba(255,106,43,.05) 70%);
-  box-shadow:0 0 46px rgba(255,106,43,.22),inset 0 0 28px rgba(255,106,43,.16);
-  transform:translateZ(calc((var(--i) - 2) * 28px))}
-@keyframes coinspin{to{transform:rotateZ(360deg)}}
-@media (max-width:900px){.coin3d{width:min(54vw,300px);top:auto;bottom:2%;right:-6%;opacity:.7}}
-@media (prefers-reduced-motion:reduce){.coin3d__spin{animation:none}}
+/* ---------- Attention field (interactive canvas) ---------- */
+.attn{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+@keyframes floatcard{
+  0%,100%{transform:perspective(1400px) rotateX(2.6deg) rotateY(-5deg) translateY(0)}
+  50%{transform:perspective(1400px) rotateX(-1.6deg) rotateY(5deg) translateY(-14px)}}
+@media (prefers-reduced-motion:reduce){.void .work-item{animation:none}}
 .void .work-item:hover{transform:translateY(-8px);box-shadow:0 56px 110px -20px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.28)}
 .void .work-item p{color:rgba(255,255,255,.66)}
 .void .work-media{border-radius:16px;box-shadow:0 20px 50px -10px rgba(0,0,0,.6)}
