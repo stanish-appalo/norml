@@ -217,12 +217,25 @@
 
   /* ===== Video ===== */
   function video(){
-    const v=document.querySelector('.phone video'); if(!v) return;
+    const v=document.querySelector('.zoom__screen video'); if(!v) return;
     v.muted=true; v.setAttribute('playsinline','');
     const p=()=>{const q=v.play();if(q&&q.catch)q.catch(()=>{});}; p();
-    new IntersectionObserver(e=>e.forEach(x=>x.isIntersecting?p():v.pause()),{threshold:.25}).observe(v);
-    const b=document.querySelector('.phone .snd');
-    if(b) b.addEventListener('click',()=>{v.muted=!v.muted;b.textContent=v.muted?'🔇':'🔊';if(!v.muted)p();});
+    new IntersectionObserver(e=>e.forEach(x=>x.isIntersecting?p():v.pause()),{threshold:.05}).observe(v);
+    const b=document.querySelector('.zoom__device .snd');
+    if(b) b.addEventListener('click',e=>{e.stopPropagation();v.muted=!v.muted;b.textContent=v.muted?'🔇':'🔊';if(!v.muted)p();});
+  }
+
+  /* ===== Scroll-into-screen (zoom) ===== */
+  function zoomScreen(){
+    if(!hasGSAP) return;
+    const sec=document.querySelector('.zoom'); const dev=document.querySelector('.zoom__device');
+    if(!sec||!dev) return;
+    const target=()=> Math.max(innerWidth/dev.offsetWidth, innerHeight/dev.offsetHeight)*1.18;
+    const tl=gsap.timeline({scrollTrigger:{trigger:sec,start:'top top',end:'bottom bottom',scrub:1,invalidateOnRefresh:true}});
+    tl.to(dev,{scale:()=>target(),ease:'power1.inOut'},0)
+      .to(['.zoom__frame','.zoom__notch'],{opacity:0,ease:'none'},0)
+      .to('.zoom__lead',{opacity:0,yPercent:-30,ease:'none'},0)
+      .fromTo('.zoom__cap',{opacity:0},{opacity:1,ease:'none'},0.5);
   }
 
   /* ===== Progress + magnetic + anchors ===== */
@@ -260,7 +273,7 @@
   }
 
   document.addEventListener('DOMContentLoaded',()=>{
-    smooth(); cursor(); blob(); reveals(); horizontal(); counters(); chart(); marquee(); video(); progress(); magnetic(); anchors();
+    smooth(); cursor(); blob(); reveals(); horizontal(); zoomScreen(); counters(); chart(); marquee(); video(); progress(); magnetic(); anchors();
     preloader(()=>{ heroIn(); if(hasGSAP) ScrollTrigger.refresh(); });
   });
 })();
