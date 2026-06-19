@@ -117,7 +117,7 @@
         }`
     });
 
-    const detail = touch ? 14 : 40;
+    const detail = touch ? 24 : 40;
     const geo = new T.IcosahedronGeometry(1.18, detail);
     const mesh = new T.Mesh(geo, mat);
     scene.add(mesh);
@@ -133,7 +133,7 @@
       const pOut=Math.min(Math.max((sy-vh*0.5)/(vh*0.6),0),1);              // recedes after slide 1
       const H=Math.max(document.documentElement.scrollHeight-vh,1);
       const pIn=Math.min(Math.max((sy-(H-vh*0.9))/(vh*0.7),0),1);           // returns on the last slide
-      const mid=0.5;                                                        // stays subtly visible in between
+      const mid=touch?0:0.5;                                               // subtle behind frosted Proof (desktop); off on mobile
       jelly=Math.max(1-pOut*(1-mid),pIn);
       canvas.style.opacity=jelly.toFixed(3);
     }
@@ -194,7 +194,7 @@
 
   /* ===== Horizontal scroll (services) ===== */
   function horizontal(){
-    if(!hasGSAP || innerWidth<=900) return;
+    if(!hasGSAP) return;
     const sec=document.querySelector('.hsec'); const track=document.querySelector('.htrack');
     if(!sec||!track) return;
     const dist=()=> track.scrollWidth - innerWidth + 1;
