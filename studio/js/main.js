@@ -252,6 +252,26 @@
       .fromTo('.zoom__cap',{opacity:0,y:20},{opacity:1,y:0,duration:.28,ease:'none'},SWAP+0.12);
   }
 
+  /* ===== 3D mouse tilt + depth layers ===== */
+  function tilt(){
+    if(touch) return;
+    document.querySelectorAll('[data-tilt]').forEach(el=>{
+      const max=parseFloat(el.dataset.tilt)||9;
+      const lift=el.classList.contains('tilt--plain')?0:6;
+      const onMove=e=>{
+        const r=el.getBoundingClientRect();
+        const px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
+        const rx=(0.5-py)*max, ry=(px-0.5)*max;
+        el.style.setProperty('--mx',(px*100).toFixed(1)+'%');
+        el.style.setProperty('--my',(py*100).toFixed(1)+'%');
+        el.style.transform=`perspective(1200px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) translateY(${-lift}px)`;
+      };
+      el.addEventListener('mouseenter',()=>el.classList.add('tilt--on'));
+      el.addEventListener('mousemove',onMove);
+      el.addEventListener('mouseleave',()=>{el.classList.remove('tilt--on');el.style.transform='';});
+    });
+  }
+
   /* ===== Progress + magnetic + anchors ===== */
   function progress(){const bar=document.querySelector('.prog');if(!bar)return;const upd=()=>{const h=document.documentElement.scrollHeight-innerHeight;bar.style.transform=`scaleX(${h>0?scrollY/h:0})`;};upd();addEventListener('scroll',upd,{passive:true});}
   function magnetic(){if(touch)return;document.querySelectorAll('[data-mag]').forEach(el=>{el.addEventListener('mousemove',e=>{const r=el.getBoundingClientRect();el.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.3}px,${(e.clientY-r.top-r.height/2)*.4}px)`;});el.addEventListener('mouseleave',()=>el.style.transform='');});}
@@ -288,7 +308,7 @@
   }
 
   document.addEventListener('DOMContentLoaded',()=>{
-    smooth(); cursor(); blob(); reveals(); horizontal(); zoomScreen(); counters(); chart(); marquee(); video(); progress(); magnetic(); anchors();
+    smooth(); cursor(); blob(); reveals(); horizontal(); zoomScreen(); tilt(); counters(); chart(); marquee(); video(); progress(); magnetic(); anchors();
     preloader(()=>{ heroIn(); if(hasGSAP) ScrollTrigger.refresh(); });
   });
 })();

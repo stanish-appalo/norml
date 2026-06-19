@@ -111,6 +111,37 @@ main{position:relative;z-index:1}
   box-shadow:0 40px 90px -20px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.22);
   transition:transform .6s var(--ease),box-shadow .6s var(--ease)}
 .void .work-item:last-child{margin-bottom:0;border-bottom:none}
+
+/* ---------- Real 3D: mouse tilt + depth layers (client wants 3D) ---------- */
+[data-tilt]{transform-style:preserve-3d;will-change:transform;transition:transform .5s var(--ease)}
+[data-tilt]::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;z-index:6;transition:opacity .45s var(--ease);background:radial-gradient(360px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.2),transparent 55%)}
+[data-tilt].tilt--on::after{opacity:1}
+[data-tilt].tilt--plain::after{display:none}
+/* work glass cards — pop the image + text forward */
+.void .work-media{transform:translateZ(50px)}
+.void .work-item>div:not(.work-media){transform:translateZ(26px)}
+/* about stats become small 3D-tilt cards */
+#about{position:relative;overflow:hidden}
+#about .wrap{position:relative;z-index:1}
+#about .stats{border-top:none;padding-top:14px}
+#about .stat{background:linear-gradient(150deg,rgba(20,19,15,.05),rgba(20,19,15,.012));border:1px solid var(--line);border-radius:16px;padding:clamp(18px,1.7vw,26px)}
+#about .stat .n{transform:translateZ(30px)}
+#about .stat .l{transform:translateZ(14px)}
+/* proof: two floating 3D cards */
+#proof .proof>div{background:linear-gradient(150deg,rgba(20,19,15,.045),rgba(20,19,15,.012));border:1px solid var(--line);border-radius:20px;padding:clamp(22px,2.6vw,38px)}
+#proof .chart{overflow:visible}
+
+/* ---------- Floating 3D coin stack — "currency that compounds" ---------- */
+.coin3d{position:absolute;top:7%;right:4%;width:min(32vw,400px);aspect-ratio:1;perspective:1200px;z-index:0;pointer-events:none}
+.coin3d__tilt{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(60deg)}
+.coin3d__spin{position:absolute;inset:0;transform-style:preserve-3d;animation:coinspin 18s linear infinite}
+.coin3d i{position:absolute;inset:26%;border-radius:50%;border:1.5px solid rgba(255,106,43,.55);
+  background:radial-gradient(circle at 36% 30%,rgba(255,185,135,.45),rgba(255,106,43,.05) 70%);
+  box-shadow:0 0 46px rgba(255,106,43,.22),inset 0 0 28px rgba(255,106,43,.16);
+  transform:translateZ(calc((var(--i) - 2) * 28px))}
+@keyframes coinspin{to{transform:rotateZ(360deg)}}
+@media (max-width:900px){.coin3d{width:min(54vw,300px);top:auto;bottom:2%;right:-6%;opacity:.7}}
+@media (prefers-reduced-motion:reduce){.coin3d__spin{animation:none}}
 .void .work-item:hover{transform:translateY(-8px);box-shadow:0 56px 110px -20px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.28)}
 .void .work-item p{color:rgba(255,255,255,.66)}
 .void .work-media{border-radius:16px;box-shadow:0 20px 50px -10px rgba(0,0,0,.6)}
