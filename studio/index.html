@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/jpeg" href="../norml_agency_logo.jpg">
+<title>norml. studio — Let's Go Viral</title>
+<meta name="description" content="norml. — a social-first creative studio. We make brands impossible to scroll past.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Preloader -->
+<div class="pre"><div class="pre__n"><b>norml.</b></div><div class="pre__bar"></div><div class="pre__pct">000 / 100</div></div>
+
+<div class="grain"></div>
+<div class="prog"></div>
+<div class="cur"></div>
+
+<!-- WebGL canvas -->
+<canvas id="gl"></canvas>
+
+<!-- Nav -->
+<nav class="nav">
+  <a href="#top" class="nav__logo">norml<i></i></a>
+  <div class="nav__links">
+    <a href="#work">Work</a>
+    <a href="#services">Services</a>
+    <a href="#proof">Proof</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <a href="#contact" class="nav__links" style="display:flex"><span>Let's talk ↗</span></a>
+</nav>
+
+<main id="top">
+
+  <!-- HERO -->
+  <header class="section hero">
+    <div class="hero__top">
+      <span class="eyebrow" data-hero-fade>Social-first creative studio</span>
+      <span class="meta" data-hero-fade>EST. — WORLDWIDE / 2026</span>
+    </div>
+    <h1 class="mega hero__title">
+      <span class="r-line"><span>We make brands</span></span>
+      <span class="r-line"><span>impossible to</span></span>
+      <span class="r-line"><span class="italic">scroll&nbsp;past.</span></span>
+    </h1>
+    <div class="hero__foot">
+      <p class="lead" style="max-width:380px" data-hero-fade>A studio for short-form video, content &amp; campaigns — built to stop the scroll and turn attention into growth.</p>
+      <div class="scrollcue" data-hero-fade>Scroll <i></i></div>
+      <a href="#contact" class="btn btn--fill" data-mag data-cursor="hi"><span>Start a project</span></a>
+    </div>
+  </header>
+
+  <!-- MANIFESTO -->
+  <section class="section section--solid" id="about">
+    <div class="wrap">
+      <span class="eyebrow" data-fade>(The idea)</span>
+      <p class="manifesto" style="margin-top:30px">
+        <span class="r-line"><span>Attention is the only</span></span>
+        <span class="r-line"><span>currency that <span class="italic" style="color:var(--warm)">compounds.</span></span></span>
+      </p>
+      <p class="lead measure" style="margin:36px 0 70px" data-fade>Ad budgets get spent. Attention gets earned — and once you have it, it builds on itself. Every save, share and rewatch teaches the algorithm to show you to more people, for free.</p>
+      <div class="stats">
+        <div class="stat" data-fade><div class="n tnum"><span data-count="3">0</span><span class="s">s</span></div><div class="l">to hook a viewer</div></div>
+        <div class="stat" data-fade><div class="n tnum"><span data-count="8.5">0</span><span class="s">×</span></div><div class="l">earned vs paid reach</div></div>
+        <div class="stat" data-fade><div class="n tnum"><span data-count="250">0</span><span class="s">M+</span></div><div class="l">views generated</div></div>
+        <div class="stat" data-fade><div class="n tnum"><span data-count="100">0</span><span class="s">%</span></div><div class="l">organic-first</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES — horizontal scroll -->
+  <section class="hsec" id="services">
+    <div class="hpin">
+      <div class="htrack">
+        <div class="hintro">
+          <span class="eyebrow" style="color:var(--lime)">(What we do)</span>
+          <h2 class="h1" style="margin-top:24px;color:var(--paper)">One studio,<br>the whole<br><span class="italic">attention engine.</span></h2>
+          <p class="lead" style="color:rgba(255,255,255,.6);margin-top:24px;max-width:360px">Strategy, creative, production &amp; growth — under one roof, moving at the speed of the feed. <span style="color:var(--lime)">Drag / scroll →</span></p>
+        </div>
+        <article class="hcard"><div><span class="hcard__no">01</span><h3>Short-form video</h3><p>Hook-first TikToks, Reels &amp; Shorts — scripted, shot and edited to be watched to the end.</p></div><div class="hcard__tags"><span class="tag">TikTok</span><span class="tag">Reels</span><span class="tag">Shorts</span></div></article>
+        <article class="hcard"><div><span class="hcard__no">02</span><h3>Social management</h3><p>Always-on strategy, calendars and community that keep your brand alive in the feed.</p></div><div class="hcard__tags"><span class="tag">Strategy</span><span class="tag">Community</span><span class="tag">Reporting</span></div></article>
+        <article class="hcard"><div><span class="hcard__no">03</span><h3>Content &amp; UGC</h3><p>Scroll-native photo, video and creator content built for how people actually watch.</p></div><div class="hcard__tags"><span class="tag">UGC</span><span class="tag">Photo</span><span class="tag">Video</span></div></article>
+        <article class="hcard"><div><span class="hcard__no">04</span><h3>Influencers</h3><p>The right creators, briefs that respect their voice, campaigns that feel native.</p></div><div class="hcard__tags"><span class="tag">Matching</span><span class="tag">Briefs</span><span class="tag">Campaigns</span></div></article>
+        <article class="hcard"><div><span class="hcard__no">05</span><h3>Branding</h3><p>Identity &amp; art direction designed to travel across every platform and format.</p></div><div class="hcard__tags"><span class="tag">Identity</span><span class="tag">Art direction</span></div></article>
+        <article class="hcard"><div><span class="hcard__no">06</span><h3>Websites &amp; product</h3><p>When a moment needs a home base, we design &amp; build it. Design-led, properly engineered.</p></div><div class="hcard__tags"><span class="tag">Sites</span><span class="tag">Product</span><span class="tag">3D</span></div></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROOF -->
+  <section class="section section--solid" id="proof">
+    <div class="wrap">
+      <span class="eyebrow" data-fade>(Proof it works)</span>
+      <h2 class="h2" style="margin:24px 0 50px;max-width:16ch" data-fade>From <span class="italic" style="color:var(--warm)">0 followers</span> to a feed people screenshot.</h2>
+      <div class="proof">
+        <div data-fade>
+          <svg class="chart" viewBox="0 0 600 280" role="img" aria-label="0 to viral growth">
+            <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff6a2b" stop-opacity=".35"/><stop offset="1" stop-color="#ff6a2b" stop-opacity="0"/></linearGradient></defs>
+            <line x1="10" y1="270" x2="590" y2="270" stroke="rgba(20,19,15,.16)"/>
+            <path class="area" d="M10 258 C 190 256, 300 250, 380 206 C 460 162, 520 74, 590 20 L 590 270 L 10 270 Z"/>
+            <path class="line" d="M10 258 C 190 256, 300 250, 380 206 C 460 162, 520 74, 590 20"/>
+            <text x="10" y="250" font-family="Space Mono,monospace" font-size="13" fill="#a49d8e">Day 0 · 0 followers</text>
+            <text x="590" y="14" text-anchor="end" font-family="Space Mono,monospace" font-size="13" fill="#ff6a2b">Day 30 · viral</text>
+          </svg>
+        </div>
+        <div data-fade>
+          <p class="lead">From scratch: we built the page, found the angle, and shipped relentlessly. In a month it pulled numbers most accounts take years to reach.</p>
+          <div class="stats" style="grid-template-columns:1fr 1fr;border:none;padding:0;margin-top:30px;gap:24px">
+            <div class="stat"><div class="n tnum"><span data-count="2.4">0</span><span class="s">M</span></div><div class="l">views / 30 days</div></div>
+            <div class="stat"><div class="n tnum">+<span data-count="38">0</span><span class="s">K</span></div><div class="l">followers gained</div></div>
+          </div>
+        </div>
+      </div>
+      <!-- mango, subtle -->
+      <div class="mango" data-fade>
+        <div class="phone" data-cursor="play">
+          <video autoplay muted loop playsinline preload="auto" poster="../media/mango_poster.jpg"><source src="../media/mango.mp4" type="video/mp4"></video>
+          <button class="snd" aria-label="Sound">🔇</button>
+        </div>
+        <div>
+          <h3 class="h3">We even made a <span class="italic" style="color:var(--warm)">mango</span> go viral.</h3>
+          <p class="lead" style="margin-top:10px;font-size:1.05rem">No budget, no celebrity — just a sharp idea and a hook-first edit. Millions of views for a piece of fruit. If the method works on a mango, imagine your brand.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORK -->
+  <section class="section section--solid" id="work">
+    <div class="wrap">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:20px">
+        <h2 class="h1" data-fade>Selected work</h2>
+        <span class="meta" data-fade>04 — projects / representative</span>
+      </div>
+
+      <article class="work-item">
+        <div class="work-media" data-para="-8" data-cursor="view"><div class="ov"></div><img src="../media/play.jpg" alt="Short-form launch"></div>
+        <div>
+          <span class="work-num">/ 01</span>
+          <h3>DTC skincare — viral launch</h3>
+          <p class="lead" style="font-size:1.05rem">A hook-first TikTok series turned a quiet product drop into a sold-out moment — 8M+ views in a week.</p>
+          <div class="hcard__tags" style="margin-top:20px"><span class="tag" style="color:var(--ink-soft);border-color:var(--line)">TikTok</span><span class="tag" style="color:var(--ink-soft);border-color:var(--line)">Launch</span></div>
+        </div>
+      </article>
+
+      <article class="work-item work-item--rev">
+        <div class="work-media" data-para="-8" data-cursor="view"><div class="ov"></div><img src="../media/meeting.jpg" alt="Always-on social"></div>
+        <div>
+          <span class="work-num">/ 02</span>
+          <h3>Restaurant group — Reels engine</h3>
+          <p class="lead" style="font-size:1.05rem">An always-on Reels system turned a local favourite into a feed regular — millions of views, a line out the door.</p>
+          <div class="hcard__tags" style="margin-top:20px"><span class="tag" style="color:var(--ink-soft);border-color:var(--line)">Reels</span><span class="tag" style="color:var(--ink-soft);border-color:var(--line)">Always-on</span></div>
+        </div>
+      </article>
+
+      <article class="work-item">
+        <div class="work-media" data-para="-8" data-cursor="view"><div class="ov"></div><img src="../media/creator.jpg" alt="Founder-led content"></div>
+        <div>
+          <span class="work-num">/ 03</span>
+          <h3>B2B SaaS — founder-led content</h3>
+          <p class="lead" style="font-size:1.05rem">We turned a camera-shy founder into a creator — short-form thought leadership that compounded into real pipeline.</p>
+          <div class="hcard__tags" style="margin-top:20px"><span class="tag" style="color:var(--ink-soft);border-color:var(--line)">B2B</span><span class="tag" style="color:var(--ink-soft);border-color:var(--line)">Founder-led</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marq" aria-hidden="true">
+    <div class="marq__t"><span class="marq__i">Let's go viral <span class="d"></span></span><span class="marq__i">Short-form <span class="d"></span></span><span class="marq__i">Content <span class="d"></span></span><span class="marq__i">Campaigns <span class="d"></span></span><span class="marq__i">Influence <span class="d"></span></span></div>
+  </div>
+
+  <!-- CONTACT -->
+  <section class="section cta" id="contact">
+    <div class="wrap">
+      <span class="eyebrow" style="justify-content:center" data-fade>(Let's talk)</span>
+      <h2 class="cta__big" style="margin-top:24px">
+        <span class="r-line"><span>Let's make</span></span>
+        <span class="r-line"><span class="italic">your moment.</span></span>
+      </h2>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:44px" data-fade>
+        <a href="mailto:hello@norml.co" class="btn btn--fill" data-mag data-cursor="email"><span>hello@norml.co</span></a>
+        <a href="https://www.linkedin.com/company/norml-company/" target="_blank" rel="noopener" class="btn"><span>LinkedIn ↗</span></a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>© 2026 norml. — Let's Go Viral</span>
+    <span>Social · Content · Campaigns · Web</span>
+    <span><a href="../index.html" class="arrow-link">Back to main site ↗</a></span>
+  </footer>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
