@@ -56,19 +56,24 @@
 
   <!-- MANIFESTO -->
   <section class="section section--solid" id="about">
-    <canvas id="attn" class="attn" aria-hidden="true"></canvas>
-    <div class="wrap">
-      <span class="eyebrow" data-fade>(The idea)</span>
-      <p class="manifesto" style="margin-top:30px">
-        <span class="r-line"><span>Attention is the only</span></span>
-        <span class="r-line"><span>currency that <span class="italic" style="color:var(--warm)">compounds.</span></span></span>
-      </p>
-      <p class="lead measure" style="margin:36px 0 70px" data-fade>Ad budgets get spent. Attention gets earned — and once you have it, it builds on itself. Every save, share and rewatch teaches the algorithm to show you to more people, for free.</p>
-      <div class="stats">
-        <div class="stat" data-fade data-tilt="11"><div class="n tnum"><span data-count="3">0</span><span class="s">s</span></div><div class="l">to hook a viewer</div></div>
-        <div class="stat" data-fade data-tilt="11"><div class="n tnum"><span data-count="8.5">0</span><span class="s">×</span></div><div class="l">earned vs paid reach</div></div>
-        <div class="stat" data-fade data-tilt="11"><div class="n tnum"><span data-count="250">0</span><span class="s">M+</span></div><div class="l">views generated</div></div>
-        <div class="stat" data-fade data-tilt="11"><div class="n tnum"><span data-count="100">0</span><span class="s">%</span></div><div class="l">organic-first</div></div>
+    <div class="wrap about-grid">
+      <div class="about-copy">
+        <span class="eyebrow" data-fade>(The idea)</span>
+        <p class="manifesto" style="margin-top:28px">
+          <span class="r-line"><span>Attention is the only</span></span>
+          <span class="r-line"><span>currency that <span class="italic" style="color:var(--warm)">compounds.</span></span></span>
+        </p>
+        <p class="lead measure" style="margin:30px 0 40px" data-fade>Ad budgets get spent. Attention gets earned — and once you have it, it builds on itself. Every save, share and rewatch teaches the algorithm to show you to more people, for free.</p>
+        <div class="stats">
+          <div class="stat" data-fade data-tilt="11"><div class="n tnum"><span data-count="3">0</span><span class="s">s</span></div><div class="l">to hook a viewer</div></div>
+          <div class="stat" data-fade data-tilt="11"><div class="n tnum"><span data-count="8.5">0</span><span class="s">×</span></div><div class="l">earned vs paid reach</div></div>
+          <div class="stat" data-fade data-tilt="11"><div class="n tnum"><span data-count="250">0</span><span class="s">M+</span></div><div class="l">views generated</div></div>
+          <div class="stat" data-fade data-tilt="11"><div class="n tnum"><span data-count="100">0</span><span class="s">%</span></div><div class="l">organic-first</div></div>
+        </div>
+      </div>
+      <div class="sculpt-wrap" data-fade>
+        <canvas id="sculpt"></canvas>
+        <span class="sculpt-hint">Drag to rotate · click to shatter</span>
       </div>
     </div>
   </section>
@@ -98,7 +103,7 @@
       <span class="eyebrow" data-fade>(Proof it works)</span>
       <h2 class="h2" style="margin:24px 0 50px;max-width:16ch" data-fade>From <span class="italic" style="color:var(--warm)">0 followers</span> to a feed people screenshot.</h2>
       <div class="proof">
-        <div data-fade data-tilt="7">
+        <div data-tilt="7">
           <svg class="chart" viewBox="0 0 600 280" role="img" aria-label="0 to viral growth">
             <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff6a2b" stop-opacity=".35"/><stop offset="1" stop-color="#ff6a2b" stop-opacity="0"/></linearGradient></defs>
             <line x1="10" y1="270" x2="590" y2="270" stroke="rgba(20,19,15,.16)"/>
@@ -108,7 +113,7 @@
             <text x="590" y="14" text-anchor="end" font-family="Space Mono,monospace" font-size="13" fill="#ff6a2b">Day 30 · viral</text>
           </svg>
         </div>
-        <div data-fade data-tilt="7">
+        <div data-tilt="7">
           <p class="lead">From scratch: we built the page, found the angle, and shipped relentlessly. In a month it pulled numbers most accounts take years to reach.</p>
           <div class="stats" style="grid-template-columns:1fr 1fr;border:none;padding:0;margin-top:30px;gap:24px">
             <div class="stat"><div class="n tnum"><span data-count="2.4">0</span><span class="s">M</span></div><div class="l">views / 30 days</div></div>
@@ -211,6 +216,7 @@
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>

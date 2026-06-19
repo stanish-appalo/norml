@@ -272,49 +272,95 @@
     });
   }
 
-  /* ===== Attention field — a grid that watches the cursor ===== */
-  function attention(){
-    const cv=document.getElementById('attn'); if(!cv) return;
-    const ctx=cv.getContext('2d'); if(!ctx) return;
-    const host=cv.parentElement;
-    let W=0,H=0,DPR=1,pts=[],raf=0,running=false,mouseIn=false,t=0;
-    const focus={x:0,y:0},target={x:0,y:0};
-    function build(){
-      const r=cv.getBoundingClientRect(); if(!r.width||!r.height) return;
-      DPR=Math.min(devicePixelRatio||1,2); W=r.width; H=r.height;
-      cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
-      const gap=Math.max(34,Math.min(56,W/26)); pts=[];
-      for(let y=gap*0.6;y<H;y+=gap){for(let x=gap*0.6;x<W;x+=gap){pts.push({x,y});}}
-      focus.x=target.x=W*0.5; focus.y=target.y=H*0.42;
+  /* ===== Interactive 3D sculpture (drag to rotate, click to shatter) ===== */
+  function sculpture(){
+    const cv=document.getElementById('sculpt'); if(!cv||!window.THREE) return;
+    const T=window.THREE, host=cv.parentElement;
+    const renderer=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+    const scene=new T.Scene();
+    const cam=new T.PerspectiveCamera(34,1,0.1,100); cam.position.set(0,0,6.2);
+    scene.add(new T.AmbientLight(0xfff4ec,0.65));
+    const key=new T.DirectionalLight(0xffffff,1.15); key.position.set(3,4,5); scene.add(key);
+    const warm=new T.DirectionalLight(0xff7a3c,0.85); warm.position.set(-4,-1,2); scene.add(warm);
+    const cool=new T.DirectionalLight(0x9c7bff,0.5); cool.position.set(-2,3,-4); scene.add(cool);
+    const group=new T.Group(); scene.add(group);
+    const uBreak={value:0}; let mesh=null, breakT=-1, running=false;
+    let rotY=0,rotX=0,tRY=0,tRX=0,drag=false,lx=0,ly=0,moved=0,auto=true;
+
+    function mat(){
+      const m=new T.MeshStandardMaterial({color:0xf3efe6,roughness:0.34,metalness:0.16});
+      m.onBeforeCompile=sh=>{
+        sh.uniforms.uBreak=uBreak;
+        sh.vertexShader='uniform float uBreak;\nattribute vec3 aDir;\nattribute float aRnd;\n'+sh.vertexShader;
+        sh.vertexShader=sh.vertexShader.replace('#include <begin_vertex>',
+          '#include <begin_vertex>\n float b=uBreak;\n transformed += aDir*(b*(0.32+aRnd*0.82));\n transformed.y -= b*b*0.5;\n');
+      };
+      return m;
     }
-    function frame(){
-      t+=0.016;
-      if(!mouseIn){target.x=W*(0.5+0.30*Math.cos(t*0.5));target.y=H*(0.45+0.26*Math.sin(t*0.7));}
-      focus.x+=(target.x-focus.x)*0.07; focus.y+=(target.y-focus.y)*0.07;
-      ctx.clearRect(0,0,W,H);
-      const maxd=Math.max(W,H);
-      for(let i=0;i<pts.length;i++){
-        const p=pts[i],dx=focus.x-p.x,dy=focus.y-p.y,d=Math.hypot(dx,dy)||1,a=Math.atan2(dy,dx);
-        const near=Math.max(0,1-d/maxd),l=8+near*18,ca=Math.cos(a),sa=Math.sin(a);
-        ctx.strokeStyle='rgba(20,19,15,'+(0.09+near*0.5).toFixed(3)+')';
-        ctx.lineWidth=1+near*1.2;
-        ctx.beginPath(); ctx.moveTo(p.x-ca*2,p.y-sa*2); ctx.lineTo(p.x+ca*l,p.y+sa*l); ctx.stroke();
-        if(near>0.18){ctx.fillStyle='rgba(255,106,43,'+(near*0.8).toFixed(3)+')';ctx.beginPath();ctx.arc(p.x+ca*l,p.y+sa*l,0.8+near*1.7,0,6.283);ctx.fill();}
+    function prep(geo){
+      geo=geo.toNonIndexed(); geo.center();
+      geo.computeBoundingSphere(); const R=(geo.boundingSphere&&geo.boundingSphere.radius)||1;
+      const pos=geo.attributes.position, n=pos.count;
+      for(let i=0;i<n;i++) pos.setXYZ(i,pos.getX(i)/R,pos.getY(i)/R,pos.getZ(i)/R);
+      pos.needsUpdate=true;
+      if(!geo.attributes.normal) geo.computeVertexNormals();
+      const dir=new Float32Array(n*3), rnd=new Float32Array(n);
+      for(let i=0;i<n;i+=3){
+        const cx=(pos.getX(i)+pos.getX(i+1)+pos.getX(i+2))/3,
+              cy=(pos.getY(i)+pos.getY(i+1)+pos.getY(i+2))/3,
+              cz=(pos.getZ(i)+pos.getZ(i+1)+pos.getZ(i+2))/3;
+        let L=Math.hypot(cx,cy,cz)||1, r=Math.random();
+        for(let k=0;k<3;k++){dir[(i+k)*3]=cx/L;dir[(i+k)*3+1]=cy/L;dir[(i+k)*3+2]=cz/L;rnd[i+k]=r;}
       }
-      const g=ctx.createRadialGradient(focus.x,focus.y,0,focus.x,focus.y,100);
-      g.addColorStop(0,'rgba(255,106,43,.26)'); g.addColorStop(1,'rgba(255,106,43,0)');
-      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(focus.x,focus.y,100,0,6.283); ctx.fill();
-      raf=requestAnimationFrame(frame);
+      geo.setAttribute('aDir',new T.BufferAttribute(dir,3));
+      geo.setAttribute('aRnd',new T.BufferAttribute(rnd,1));
+      return geo;
     }
-    function start(){if(running)return;running=true;build();raf=requestAnimationFrame(frame);}
-    function stop(){running=false;cancelAnimationFrame(raf);}
-    addEventListener('resize',()=>{if(running)build();});
-    addEventListener('mousemove',e=>{
-      const r=host.getBoundingClientRect();
-      mouseIn=e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;
-      if(mouseIn){const cr=cv.getBoundingClientRect();target.x=e.clientX-cr.left;target.y=e.clientY-cr.top;}
+    function add(geo){ mesh=new T.Mesh(prep(geo),mat()); mesh.scale.setScalar(1.85); group.add(mesh); }
+    function fallback(){ add(new T.IcosahedronGeometry(1,1)); }
+
+    if(T.GLTFLoader){
+      try{
+        new T.GLTFLoader().load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/models/gltf/LeePerrySmith/LeePerrySmith.glb',
+          g=>{ let geo=null; g.scene.traverse(o=>{if(o.isMesh&&!geo)geo=o.geometry;}); geo?add(geo):fallback(); },
+          undefined, ()=>fallback());
+      }catch(e){ fallback(); }
+    } else fallback();
+
+    const px=e=>e.touches?e.touches[0].clientX:e.clientX, py=e=>e.touches?e.touches[0].clientY:e.clientY;
+    cv.addEventListener('pointerdown',e=>{drag=true;moved=0;lx=px(e);ly=py(e);auto=false;});
+    addEventListener('pointermove',e=>{ if(!drag)return; const x=px(e),y=py(e),dx=x-lx,dy=y-ly; lx=x;ly=y; moved+=Math.abs(dx)+Math.abs(dy); tRY+=dx*0.01; tRX=Math.max(-1.1,Math.min(1.1,tRX+dy*0.01)); });
+    addEventListener('pointerup',()=>{ if(drag&&moved<7&&breakT<0) breakT=0; drag=false; setTimeout(()=>auto=true,2200); });
+
+    function resize(){ const r=host.getBoundingClientRect(); if(!r.width)return; renderer.setSize(r.width,r.height,false); cam.aspect=r.width/r.height; cam.updateProjectionMatrix(); }
+    addEventListener('resize',resize);
+    function loop(){
+      if(!running) return;
+      if(auto) tRY+=0.0035;
+      rotY+=(tRY-rotY)*0.08; rotX+=(tRX-rotX)*0.08;
+      group.rotation.set(rotX,rotY,0);
+      if(breakT>=0){ breakT+=0.016; const p=breakT; let v;
+        if(p<0.5) v=p/0.5; else if(p<1.0) v=1; else if(p<1.9) v=1-(p-1.0)/0.9; else {v=0;breakT=-1;}
+        uBreak.value=v*v*(3-2*v);
+      }
+      renderer.render(scene,cam); requestAnimationFrame(loop);
+    }
+    new IntersectionObserver(es=>es.forEach(x=>{ if(x.isIntersecting&&!running){running=true;resize();loop();} else if(!x.isIntersecting){running=false;} }),{threshold:0.01}).observe(host);
+    resize();
+  }
+
+  /* ===== Tap reactions — orange-outline like/heart/share burst ===== */
+  function reactions(){
+    const HEART='<svg viewBox="0 0 24 24" fill="#fff" stroke="#ff6a2b" stroke-width="2" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 1 0-7.8 7.8l1.1 1L12 21l7.7-7.5 1.1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+    const LIKE='<svg viewBox="0 0 24 24" fill="#fff" stroke="#ff6a2b" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M7 22V11M2 13v7a2 2 0 0 0 2 2h13.3a2 2 0 0 0 2-1.7l1.4-9A2 2 0 0 0 18.7 9H14V5a2 2 0 0 0-2-2l-3 7v12"/></svg>';
+    const SHARE='<svg viewBox="0 0 24 24" fill="#fff" stroke="#ff6a2b" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>';
+    const set=[HEART,LIKE,SHARE]; let i=0;
+    addEventListener('pointerdown',e=>{
+      const el=document.createElement('div'); el.className='react'; el.innerHTML=set[i++%set.length];
+      el.style.left=(e.clientX)+'px'; el.style.top=(e.clientY)+'px';
+      document.body.appendChild(el); setTimeout(()=>el.remove(),1100);
     },{passive:true});
-    new IntersectionObserver(es=>es.forEach(x=>x.isIntersecting?start():stop()),{threshold:0}).observe(host);
   }
 
   /* ===== Progress + magnetic + anchors ===== */
@@ -353,7 +399,7 @@
   }
 
   document.addEventListener('DOMContentLoaded',()=>{
-    smooth(); cursor(); blob(); reveals(); horizontal(); zoomScreen(); tilt(); attention(); counters(); chart(); marquee(); video(); progress(); magnetic(); anchors();
+    smooth(); cursor(); blob(); reveals(); horizontal(); zoomScreen(); tilt(); sculpture(); reactions(); counters(); chart(); marquee(); video(); progress(); magnetic(); anchors();
     preloader(()=>{ heroIn(); if(hasGSAP) ScrollTrigger.refresh(); });
   });
 })();

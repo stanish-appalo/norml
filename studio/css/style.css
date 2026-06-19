@@ -39,7 +39,7 @@ html.lenis,html.lenis body{height:auto}
 
 /* ---------- Type ---------- */
 h1,h2,h3,h4{font-family:var(--fdisp);font-weight:600;line-height:.98;letter-spacing:-.03em}
-.mega{font-family:var(--fdisp);font-weight:600;font-size:clamp(2.6rem,9.2vw,9.6rem);line-height:.9;letter-spacing:-.04em}
+.mega{font-family:var(--fdisp);font-weight:600;font-size:clamp(2.6rem,9.4vw,9.8rem);line-height:.84;letter-spacing:-.055em;word-spacing:-.04em}
 .h1{font-size:clamp(2.4rem,7vw,7rem);line-height:.94;letter-spacing:-.04em}
 .h2{font-size:clamp(2.2rem,5.8vw,5.2rem);line-height:.98;letter-spacing:-.035em}
 .h3{font-size:clamp(1.5rem,3vw,2.7rem);letter-spacing:-.02em}
@@ -121,23 +121,37 @@ main{position:relative;z-index:1}
 /* work glass cards — pop the image + text forward */
 .void .work-media{transform:translateZ(50px)}
 .void .work-item>div:not(.work-media){transform:translateZ(26px)}
-/* about stats become small 3D-tilt cards */
+/* about: copy + interactive 3D sculpture */
 #about{position:relative;overflow:hidden}
-#about .wrap{position:relative;z-index:1}
-#about .stats{border-top:none;padding-top:14px}
+.about-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(28px,5vw,72px);align-items:center}
+.about-copy{position:relative;z-index:1}
+#about .stats{border-top:none;padding-top:6px;grid-template-columns:1fr 1fr;gap:18px}
 #about .stat{background:linear-gradient(150deg,rgba(20,19,15,.05),rgba(20,19,15,.012));border:1px solid var(--line);border-radius:16px;padding:clamp(18px,1.7vw,26px)}
 #about .stat .n{transform:translateZ(30px)}
 #about .stat .l{transform:translateZ(14px)}
-/* proof: two floating 3D cards */
-#proof .proof>div{background:linear-gradient(150deg,rgba(20,19,15,.045),rgba(20,19,15,.012));border:1px solid var(--line);border-radius:20px;padding:clamp(22px,2.6vw,38px)}
-#proof .chart{overflow:visible}
+.sculpt-wrap{position:relative;height:min(62vh,560px);min-height:330px}
+#sculpt{width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+#sculpt:active{cursor:grabbing}
+.sculpt-hint{position:absolute;bottom:2px;left:0;right:0;text-align:center;font-family:var(--fmono);font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);pointer-events:none}
+/* proof: two floating 3D cards with depth */
+#proof .proof>div{background:linear-gradient(150deg,rgba(20,19,15,.05),rgba(20,19,15,.015));border:1px solid var(--line);border-radius:20px;padding:clamp(22px,2.6vw,38px);box-shadow:0 34px 72px -28px rgba(20,19,15,.3);animation:floatsoft 13s ease-in-out infinite}
+#proof .proof>div:nth-child(2){animation-delay:-6.5s}
+#proof .chart{overflow:visible;transform:translateZ(36px)}
+#proof .proof>div .stats{transform:translateZ(26px)}
+#proof .proof>div .lead{transform:translateZ(14px)}
 
-/* ---------- Attention field (interactive canvas) ---------- */
-.attn{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+/* ---------- resting float + click reactions ---------- */
 @keyframes floatcard{
   0%,100%{transform:perspective(1400px) rotateX(2.6deg) rotateY(-5deg) translateY(0)}
   50%{transform:perspective(1400px) rotateX(-1.6deg) rotateY(5deg) translateY(-14px)}}
-@media (prefers-reduced-motion:reduce){.void .work-item{animation:none}}
+@keyframes floatsoft{
+  0%,100%{transform:perspective(1500px) rotateX(2deg) rotateY(-3.2deg) translateY(0)}
+  50%{transform:perspective(1500px) rotateX(-1.2deg) rotateY(3.2deg) translateY(-11px)}}
+.react{position:fixed;z-index:9997;pointer-events:none;transform:translate(-50%,-50%);animation:reactpop 1.05s var(--ease) forwards;will-change:transform,opacity}
+.react svg{width:30px;height:30px;display:block;filter:drop-shadow(0 4px 10px rgba(255,106,43,.35))}
+@keyframes reactpop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}22%{opacity:1;transform:translate(-50%,-64%) scale(1.08)}100%{opacity:0;transform:translate(-50%,-170%) scale(.85)}}
+@media (max-width:900px){.about-grid{grid-template-columns:1fr}.sculpt-wrap{height:46vh;min-height:300px}}
+@media (prefers-reduced-motion:reduce){.void .work-item,#proof .proof>div{animation:none}}
 .void .work-item:hover{transform:translateY(-8px);box-shadow:0 56px 110px -20px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.28)}
 .void .work-item p{color:rgba(255,255,255,.66)}
 .void .work-media{border-radius:16px;box-shadow:0 20px 50px -10px rgba(0,0,0,.6)}
