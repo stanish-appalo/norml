@@ -239,16 +239,17 @@
     const sec=document.querySelector('.zoom'); const dev=document.querySelector('.zoom__device');
     if(!sec||!dev) return;
     const v=sec.querySelector('video');
-    const target=()=> Math.max(innerWidth/dev.offsetWidth, innerHeight/dev.offsetHeight)*1.2;
+    const SWAP=0.34;  // when the video stops & the image takes over (earlier = sooner)
+    const target=()=> Math.max(innerWidth/dev.offsetWidth, innerHeight/dev.offsetHeight)*1.32;
     const tl=gsap.timeline({scrollTrigger:{trigger:sec,start:'top top',end:'bottom bottom',scrub:1,invalidateOnRefresh:true,
-      onUpdate:self=>{ if(!v) return; if(self.progress>0.5){ if(!v.paused) v.pause(); } else if(v.paused){ const p=v.play(); if(p&&p.catch)p.catch(()=>{}); } }}});
-    tl.to(dev,{scale:()=>target(),duration:1,ease:'power1.inOut'},0)
-      .to(['.zoom__frame','.zoom__notch'],{opacity:0,duration:.45,ease:'none'},0)
-      .to('.zoom__lead',{opacity:0,yPercent:-30,duration:.5,ease:'none'},0)
-      // halfway: the playing video stops & swaps to an image, carrying you into the next section
-      .to('.zoom__screen video',{opacity:0,duration:.22,ease:'none'},0.5)
-      .fromTo('.zoom__swap',{opacity:0,scale:1.14},{opacity:1,scale:1,duration:.42,ease:'power2.out'},0.5)
-      .fromTo('.zoom__cap',{opacity:0,y:20},{opacity:1,y:0,duration:.3,ease:'none'},0.62);
+      onUpdate:self=>{ if(!v) return; if(self.progress>SWAP){ if(!v.paused) v.pause(); } else if(v.paused){ const p=v.play(); if(p&&p.catch)p.catch(()=>{}); } }}});
+    tl.to(dev,{scale:()=>target(),duration:1,ease:'power2.in'},0)
+      .to(['.zoom__frame','.zoom__notch'],{opacity:0,duration:.32,ease:'none'},0)
+      .to('.zoom__lead',{opacity:0,yPercent:-30,duration:.34,ease:'none'},0)
+      // the playing video stops & swaps to an image, carrying you into the next section
+      .to('.zoom__screen video',{opacity:0,duration:.16,ease:'none'},SWAP)
+      .fromTo('.zoom__swap',{opacity:0,scale:1.14},{opacity:1,scale:1,duration:.32,ease:'power2.out'},SWAP)
+      .fromTo('.zoom__cap',{opacity:0,y:20},{opacity:1,y:0,duration:.28,ease:'none'},SWAP+0.12);
   }
 
   /* ===== Progress + magnetic + anchors ===== */
