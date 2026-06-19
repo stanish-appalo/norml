@@ -389,46 +389,39 @@
   }
 
   /* ===== Ballpit — interactive physics spheres (21st.dev, ported, our palette) ===== */
+  /* ===== Static centered 3D dot-grid (services backdrop, Spline-style colors) ===== */
   function dots(){
     const cv=document.getElementById('dotsgl'); if(!cv||!window.THREE) return;
     const T=window.THREE, host=cv.parentElement;
     const renderer=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
     renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
     const scene=new T.Scene();
-    const cam=new T.PerspectiveCamera(55,1,0.1,100); cam.position.set(0,0,16);
+    const cam=new T.PerspectiveCamera(50,1,0.1,100); cam.position.set(0,0,15);
     // soft round glow sprite
     const c=document.createElement('canvas'); c.width=c.height=64; const cx=c.getContext('2d');
     const g=cx.createRadialGradient(32,32,0,32,32,32);
-    g.addColorStop(0,'rgba(255,255,255,1)'); g.addColorStop(0.25,'rgba(255,255,255,.7)'); g.addColorStop(1,'rgba(255,255,255,0)');
+    g.addColorStop(0,'rgba(255,255,255,1)'); g.addColorStop(0.3,'rgba(255,255,255,.6)'); g.addColorStop(1,'rgba(255,255,255,0)');
     cx.fillStyle=g; cx.beginPath(); cx.arc(32,32,32,0,6.283); cx.fill();
     const tex=new T.CanvasTexture(c);
-    const N=touch?340:680;
-    const pos=new Float32Array(N*3), col=new Float32Array(N*3), siz=new Float32Array(N);
-    // Spline scene's own palette — blues / purples / cyan (kept, not recolored)
-    const pal=[[0.22,0.30,1.0],[0.46,0.38,1.0],[0.16,0.80,1.0],[0.58,0.48,1.0],[0.30,0.52,1.0],[0.80,0.82,1.0]];
-    for(let i=0;i<N;i++){
-      pos[i*3]=(Math.random()*2-1)*19; pos[i*3+1]=(Math.random()*2-1)*11; pos[i*3+2]=(Math.random()*2-1)*9;
-      const p=pal[Math.floor(Math.random()*pal.length)]; col[i*3]=p[0]; col[i*3+1]=p[1]; col[i*3+2]=p[2];
-      siz[i]=0.25+Math.random()*0.5;
+    // a horizontally-stretched DIAMOND made of small 4-dot clusters (flat, static)
+    const CX=8, CY=4, cell=1.18, d=0.34;   // CX>CY -> stretched left/right; smaller overall coverage
+    const pos=[], col=[];
+    const pal=[[0.24,0.32,1.0],[0.50,0.40,1.0],[0.18,0.82,1.0],[0.62,0.50,1.0]]; // spline blues/purples/cyan
+    const quad=[[-1,-1],[1,-1],[-1,1],[1,1]];
+    for(let gx=-CX;gx<=CX;gx++) for(let gy=-CY;gy<=CY;gy++){
+      if(Math.abs(gx/CX)+Math.abs(gy/CY) > 1.001) continue;   // diamond mask
+      const px=gx*cell, py=gy*cell, p=pal[((gx+gy)%pal.length+pal.length)%pal.length];
+      for(const q of quad){ pos.push(px+q[0]*d, py+q[1]*d, 0); col.push(p[0],p[1],p[2]); }
     }
     const geo=new T.BufferGeometry();
-    geo.setAttribute('position',new T.BufferAttribute(pos,3));
-    geo.setAttribute('color',new T.BufferAttribute(col,3));
-    const mat=new T.PointsMaterial({size:0.55,map:tex,vertexColors:true,transparent:true,opacity:0.9,depthWrite:false,blending:T.AdditiveBlending,sizeAttenuation:true});
-    const pts=new T.Points(geo,mat); scene.add(pts);
-    const mouse={x:0,y:0,tx:0,ty:0};
-    addEventListener('mousemove',e=>{ mouse.tx=(e.clientX/innerWidth-0.5); mouse.ty=(e.clientY/innerHeight-0.5); });
-    let running=false, tt=0;
-    function resize(){ const r=host.getBoundingClientRect(); if(!r.width)return; renderer.setSize(r.width,r.height,false); cam.aspect=r.width/r.height; cam.updateProjectionMatrix(); }
-    function loop(){
-      if(!running) return;
-      tt+=0.016;
-      mouse.x+=(mouse.tx-mouse.x)*0.04; mouse.y+=(mouse.ty-mouse.y)*0.04;
-      pts.rotation.y=tt*0.05+mouse.x*0.6; pts.rotation.x=Math.sin(tt*0.2)*0.08+mouse.y*0.35;
-      renderer.render(scene,cam); requestAnimationFrame(loop);
-    }
+    geo.setAttribute('position',new T.Float32BufferAttribute(pos,3));
+    geo.setAttribute('color',new T.Float32BufferAttribute(col,3));
+    const mat=new T.PointsMaterial({size:0.34,map:tex,vertexColors:true,transparent:true,opacity:0.95,depthWrite:false,blending:T.AdditiveBlending,sizeAttenuation:true});
+    const pts=new T.Points(geo,mat); scene.add(pts);   // flat, facing camera — static
+    function draw(){ renderer.render(scene,cam); }
+    function resize(){ const r=host.getBoundingClientRect(); if(!r.width)return; renderer.setSize(r.width,r.height,false); cam.aspect=r.width/r.height; cam.updateProjectionMatrix(); draw(); }
     addEventListener('resize',resize);
-    new IntersectionObserver(es=>es.forEach(x=>{ if(x.isIntersecting&&!running){running=true;resize();loop();} else if(!x.isIntersecting){running=false;} }),{threshold:0.01}).observe(host);
+    new IntersectionObserver(es=>es.forEach(x=>{ if(x.isIntersecting) resize(); }),{threshold:0.01}).observe(host);
     resize();
   }
 
