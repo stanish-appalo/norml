@@ -121,18 +121,25 @@ main{position:relative;z-index:1}
 /* work glass cards — pop the image + text forward */
 .void .work-media{transform:translateZ(50px)}
 .void .work-item>div:not(.work-media){transform:translateZ(26px)}
-/* about: copy + interactive 3D sculpture */
-#about{position:relative;overflow:hidden}
-.about-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(28px,5vw,72px);align-items:center}
+/* about: dark stage + interactive 3D sculpture */
+#about{position:relative;overflow:hidden;color:#fff;
+  background:
+    radial-gradient(640px 660px at 77% 42%, rgba(255,120,55,.28), rgba(255,120,55,.03) 56%, transparent 72%),
+    radial-gradient(1000px 820px at 46% 16%, #15131b, #0a0812 72%),
+    #06050d}
+.about-grid{display:grid;grid-template-columns:1fr .95fr;gap:clamp(26px,5vw,60px);align-items:center}
 .about-copy{position:relative;z-index:1}
-#about .stats{border-top:none;padding-top:6px;grid-template-columns:1fr 1fr;gap:18px}
-#about .stat{background:linear-gradient(150deg,rgba(20,19,15,.05),rgba(20,19,15,.012));border:1px solid var(--line);border-radius:16px;padding:clamp(18px,1.7vw,26px)}
-#about .stat .n{transform:translateZ(30px)}
-#about .stat .l{transform:translateZ(14px)}
-.sculpt-wrap{position:relative;height:min(62vh,560px);min-height:330px}
+#about .eyebrow{color:rgba(255,255,255,.72)}
+#about .manifesto{color:#fff}
+#about .lead{color:rgba(255,255,255,.66)}
+#about .stats{border-top:none;padding-top:6px;grid-template-columns:1fr 1fr;gap:16px}
+#about .stat{background:linear-gradient(150deg,rgba(255,255,255,.1),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:clamp(18px,1.7vw,26px)}
+#about .stat .n{transform:translateZ(30px);color:#fff}
+#about .stat .l{transform:translateZ(14px);color:rgba(255,255,255,.6)}
+.sculpt-wrap{position:relative;height:min(82vh,740px);min-height:400px;align-self:stretch}
 #sculpt{width:100%;height:100%;display:block;cursor:grab;touch-action:none}
 #sculpt:active{cursor:grabbing}
-.sculpt-hint{position:absolute;bottom:2px;left:0;right:0;text-align:center;font-family:var(--fmono);font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);pointer-events:none}
+.sculpt-hint{position:absolute;bottom:2px;left:0;right:0;text-align:center;font-family:var(--fmono);font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.4);pointer-events:none}
 /* proof: two floating 3D cards with depth */
 #proof .proof>div{background:linear-gradient(150deg,rgba(20,19,15,.05),rgba(20,19,15,.015));border:1px solid var(--line);border-radius:20px;padding:clamp(22px,2.6vw,38px);box-shadow:0 34px 72px -28px rgba(20,19,15,.3);animation:floatsoft 13s ease-in-out infinite}
 #proof .proof>div:nth-child(2){animation-delay:-6.5s}
@@ -167,7 +174,7 @@ main{position:relative;z-index:1}
 [data-fade]{will-change:transform,opacity}
 
 /* ---------- Hero ---------- */
-.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding-block:0;position:relative}
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-start;padding-top:clamp(160px,25vh,300px);padding-bottom:clamp(180px,22vh,260px);position:relative}
 .hero__top{position:absolute;top:clamp(96px,13vh,150px);left:var(--gut);right:var(--gut);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .hero__title{margin:0;position:relative;z-index:2;pointer-events:none}
 .hero__title .italic{font-weight:400}

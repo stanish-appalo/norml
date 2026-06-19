@@ -128,7 +128,13 @@
     const mouse = {x:0,y:0,tx:0,ty:0};
     addEventListener('mousemove',e=>{ mouse.tx=(e.clientX/innerWidth)*2-1; mouse.ty=-((e.clientY/innerHeight)*2-1); });
     let scrollAmp=0;
-    addEventListener('scroll',()=>{ scrollAmp = Math.min(scrollY/innerHeight,1); }, {passive:true});
+    addEventListener('scroll',()=>{
+      scrollAmp = Math.min(scrollY/innerHeight,1);
+      // carry the jelly into slide 2: blur, fade & sink as you scroll down
+      const p = Math.min(Math.max((scrollY - innerHeight*0.5)/(innerHeight*0.72),0),1);
+      canvas.style.filter = p>0.002 ? 'blur('+(p*26).toFixed(1)+'px)' : 'none';
+      canvas.style.opacity = (1 - p*0.78).toFixed(3);
+    }, {passive:true});
 
     function resize(){ cam.aspect=innerWidth/innerHeight; cam.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); place(); }
     resize(); addEventListener('resize',resize);
@@ -136,7 +142,7 @@
     const clock = new T.Clock();
     (function render(){
       requestAnimationFrame(render);
-      if (scrollY > innerHeight*1.15) return;           // pause when hero off-screen
+      if (scrollY > innerHeight*1.8) return;            // pause once well past the hero
       const dt = clock.getDelta();
       uniforms.uTime.value += dt;
       mouse.x += (mouse.tx-mouse.x)*0.05; mouse.y += (mouse.ty-mouse.y)*0.05;
@@ -317,7 +323,7 @@
       geo.setAttribute('aRnd',new T.BufferAttribute(rnd,1));
       return geo;
     }
-    function add(geo){ mesh=new T.Mesh(prep(geo),mat()); mesh.scale.setScalar(1.85); group.add(mesh); }
+    function add(geo){ mesh=new T.Mesh(prep(geo),mat()); mesh.scale.setScalar(2.2); mesh.position.y=-0.15; group.add(mesh); }
     function fallback(){ add(new T.IcosahedronGeometry(1,1)); }
 
     if(T.GLTFLoader){
