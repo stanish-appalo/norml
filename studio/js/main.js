@@ -309,7 +309,7 @@
         sh.uniforms.uBreak=uBreak;
         sh.vertexShader='uniform float uBreak;\nattribute vec3 aDir;\nattribute float aRnd;\n'+sh.vertexShader;
         sh.vertexShader=sh.vertexShader.replace('#include <begin_vertex>',
-          '#include <begin_vertex>\n float b=uBreak;\n transformed += aDir*(b*(0.32+aRnd*0.82));\n transformed.y -= b*b*0.5;\n');
+          '#include <begin_vertex>\n float b=uBreak;\n transformed += aDir*(b*(0.28+aRnd*0.62));\n transformed.y -= b*b*0.28;\n');
       };
       return m;
     }
@@ -368,6 +368,7 @@
         if(p<0.5) v=p/0.5; else if(p<1.0) v=1; else if(p<1.9) v=1-(p-1.0)/0.9; else {v=0;breakT=-1;}
         uBreak.value=v*v*(3-2*v);
       }
+      cam.position.z=6.2+uBreak.value*7.5;   // pull back as it shatters so fragments stay in frame
       renderer.render(scene,cam); requestAnimationFrame(loop);
     }
     new IntersectionObserver(es=>es.forEach(x=>{ if(x.isIntersecting&&!running){running=true;resize();loop();} else if(!x.isIntersecting){running=false;} }),{threshold:0.01}).observe(host);
@@ -388,72 +389,46 @@
   }
 
   /* ===== Ballpit — interactive physics spheres (21st.dev, ported, our palette) ===== */
-  function ballpit(){
-    const cv=document.getElementById('boxgl'); if(!cv||!window.THREE) return;
+  function dots(){
+    const cv=document.getElementById('dotsgl'); if(!cv||!window.THREE) return;
     const T=window.THREE, host=cv.parentElement;
-    const renderer=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true,powerPreference:'high-performance'});
+    const renderer=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
     renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
-    if(T.sRGBEncoding) renderer.outputEncoding=T.sRGBEncoding;
-    if(T.ACESFilmicToneMapping){ renderer.toneMapping=T.ACESFilmicToneMapping; renderer.toneMappingExposure=1.0; }
     const scene=new T.Scene();
-    const cam=new T.PerspectiveCamera(50,1,0.1,100); cam.position.set(0,0,20);
-    let env=null;
-    try{ if(T.RoomEnvironment){ const pm=new T.PMREMGenerator(renderer); env=pm.fromScene(new T.RoomEnvironment(),0.04).texture; scene.environment=env; } }catch(e){}
-    scene.add(new T.AmbientLight(0xffffff,1.3));
-    const plight=new T.PointLight(0xffffff,3,120,1); scene.add(plight);
-
-    const cfg={count:touch?90:150,gravity:0.42,friction:0.99,wallBounce:0.25,maxVel:0.13,minSize:0.4,maxSize:0.95,size0:1.15,maxX:12,maxY:7,maxZ:5,follow:true};
-    const pos=new Float32Array(cfg.count*3), vel=new Float32Array(cfg.count*3), sz=new Float32Array(cfg.count);
-    const center=new T.Vector3();
-    sz[0]=cfg.size0;
-    for(let i=1;i<cfg.count;i++){ const b=3*i; pos[b]=(Math.random()*2-1)*cfg.maxX; pos[b+1]=(Math.random()*2-1)*cfg.maxY; pos[b+2]=(Math.random()*2-1)*cfg.maxZ; sz[i]=cfg.minSize+Math.random()*(cfg.maxSize-cfg.minSize); }
-
-    const geo=new T.SphereGeometry(1,24,24);
-    const mat=new T.MeshPhysicalMaterial({envMap:env,metalness:0.5,roughness:0.26,clearcoat:0.8,clearcoatRoughness:0.25});
-    const mesh=new T.InstancedMesh(geo,mat,cfg.count); mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); scene.add(mesh);
-    const palette=[0xf4f1ea,0xffffff,0xc8ff2e,0xff6a2b,0xe9e4d8,0xf4f1ea].map(c=>new T.Color(c));
-    for(let i=0;i<cfg.count;i++) mesh.setColorAt(i, i===0?new T.Color(0xff6a2b):palette[i%palette.length]);
-    if(mesh.instanceColor) mesh.instanceColor.needsUpdate=true;
-
-    const ray=new T.Raycaster(), plane=new T.Plane(new T.Vector3(0,0,1),0), hit=new T.Vector3(), ptr=new T.Vector2(); let hasPtr=false;
-    addEventListener('pointermove',e=>{ ptr.set((e.clientX/innerWidth)*2-1, -(e.clientY/innerHeight)*2+1); hasPtr=true; });
-
-    const dummy=new T.Object3D(), v=new T.Vector3(), diff=new T.Vector3();
-    function physics(dt){
-      const f=Math.min(dt,0.04)*60;
-      if(cfg.follow){ v.set(pos[0],pos[1],pos[2]).lerp(center,0.12); pos[0]=v.x;pos[1]=v.y;pos[2]=v.z; vel[0]=vel[1]=vel[2]=0; }
-      for(let i=1;i<cfg.count;i++){
-        const b=3*i;
-        vel[b+1]-=0.016*cfg.gravity*sz[i];
-        vel[b]*=cfg.friction; vel[b+1]*=cfg.friction; vel[b+2]*=cfg.friction;
-        const vl=Math.hypot(vel[b],vel[b+1],vel[b+2]); if(vl>cfg.maxVel){ const s=cfg.maxVel/vl; vel[b]*=s;vel[b+1]*=s;vel[b+2]*=s; }
-        pos[b]+=vel[b]*f; pos[b+1]+=vel[b+1]*f; pos[b+2]+=vel[b+2]*f;
-        for(let j=i+1;j<cfg.count;j++){
-          const ob=3*j; diff.set(pos[ob]-pos[b],pos[ob+1]-pos[b+1],pos[ob+2]-pos[b+2]);
-          const d=diff.length()||0.0001, sum=sz[i]+sz[j];
-          if(d<sum){ const o=(sum-d)*0.5; diff.multiplyScalar(1/d); pos[b]-=diff.x*o;pos[b+1]-=diff.y*o;pos[b+2]-=diff.z*o; pos[ob]+=diff.x*o;pos[ob+1]+=diff.y*o;pos[ob+2]+=diff.z*o; }
-        }
-        if(Math.abs(pos[b])+sz[i]>cfg.maxX){ pos[b]=Math.sign(pos[b])*(cfg.maxX-sz[i]); vel[b]*=-cfg.wallBounce; }
-        if(pos[b+1]-sz[i]<-cfg.maxY){ pos[b+1]=-cfg.maxY+sz[i]; vel[b+1]*=-cfg.wallBounce; }
-        if(pos[b+1]+sz[i]>cfg.maxY){ pos[b+1]=cfg.maxY-sz[i]; vel[b+1]*=-cfg.wallBounce; }
-        if(Math.abs(pos[b+2])+sz[i]>cfg.maxZ){ pos[b+2]=Math.sign(pos[b+2])*(cfg.maxZ-sz[i]); vel[b+2]*=-cfg.wallBounce; }
-      }
+    const cam=new T.PerspectiveCamera(55,1,0.1,100); cam.position.set(0,0,16);
+    // soft round glow sprite
+    const c=document.createElement('canvas'); c.width=c.height=64; const cx=c.getContext('2d');
+    const g=cx.createRadialGradient(32,32,0,32,32,32);
+    g.addColorStop(0,'rgba(255,255,255,1)'); g.addColorStop(0.25,'rgba(255,255,255,.7)'); g.addColorStop(1,'rgba(255,255,255,0)');
+    cx.fillStyle=g; cx.beginPath(); cx.arc(32,32,32,0,6.283); cx.fill();
+    const tex=new T.CanvasTexture(c);
+    const N=touch?340:680;
+    const pos=new Float32Array(N*3), col=new Float32Array(N*3), siz=new Float32Array(N);
+    // Spline scene's own palette — blues / purples / cyan (kept, not recolored)
+    const pal=[[0.22,0.30,1.0],[0.46,0.38,1.0],[0.16,0.80,1.0],[0.58,0.48,1.0],[0.30,0.52,1.0],[0.80,0.82,1.0]];
+    for(let i=0;i<N;i++){
+      pos[i*3]=(Math.random()*2-1)*19; pos[i*3+1]=(Math.random()*2-1)*11; pos[i*3+2]=(Math.random()*2-1)*9;
+      const p=pal[Math.floor(Math.random()*pal.length)]; col[i*3]=p[0]; col[i*3+1]=p[1]; col[i*3+2]=p[2];
+      siz[i]=0.25+Math.random()*0.5;
     }
-    function sync(){
-      for(let i=0;i<cfg.count;i++){ const b=3*i; dummy.position.set(pos[b],pos[b+1],pos[b+2]); dummy.scale.setScalar(sz[i]); dummy.updateMatrix(); mesh.setMatrixAt(i,dummy.matrix); }
-      mesh.instanceMatrix.needsUpdate=true; plight.position.set(pos[0],pos[1],pos[2]);
-    }
-    const clock=new T.Clock(); let running=false;
-    function frameDims(){ const fovr=cam.fov*Math.PI/180, wH=2*Math.tan(fovr/2)*cam.position.z, wW=wH*cam.aspect; cfg.maxX=wW/2; cfg.maxY=wH/2; cfg.maxZ=Math.max(wW/4,3); }
-    function resize(){ const r=host.getBoundingClientRect(); if(!r.width)return; renderer.setSize(r.width,r.height,false); cam.aspect=r.width/r.height; cam.updateProjectionMatrix(); frameDims(); }
+    const geo=new T.BufferGeometry();
+    geo.setAttribute('position',new T.BufferAttribute(pos,3));
+    geo.setAttribute('color',new T.BufferAttribute(col,3));
+    const mat=new T.PointsMaterial({size:0.55,map:tex,vertexColors:true,transparent:true,opacity:0.9,depthWrite:false,blending:T.AdditiveBlending,sizeAttenuation:true});
+    const pts=new T.Points(geo,mat); scene.add(pts);
+    const mouse={x:0,y:0,tx:0,ty:0};
+    addEventListener('mousemove',e=>{ mouse.tx=(e.clientX/innerWidth-0.5); mouse.ty=(e.clientY/innerHeight-0.5); });
+    let running=false, tt=0;
+    function resize(){ const r=host.getBoundingClientRect(); if(!r.width)return; renderer.setSize(r.width,r.height,false); cam.aspect=r.width/r.height; cam.updateProjectionMatrix(); }
     function loop(){
       if(!running) return;
-      const dt=clock.getDelta();
-      if(cfg.follow && hasPtr){ ray.setFromCamera(ptr,cam); ray.ray.intersectPlane(plane,hit); if(hit) center.copy(hit); }
-      physics(dt); sync(); renderer.render(scene,cam); requestAnimationFrame(loop);
+      tt+=0.016;
+      mouse.x+=(mouse.tx-mouse.x)*0.04; mouse.y+=(mouse.ty-mouse.y)*0.04;
+      pts.rotation.y=tt*0.05+mouse.x*0.6; pts.rotation.x=Math.sin(tt*0.2)*0.08+mouse.y*0.35;
+      renderer.render(scene,cam); requestAnimationFrame(loop);
     }
     addEventListener('resize',resize);
-    new IntersectionObserver(es=>es.forEach(x=>{ if(x.isIntersecting&&!running){running=true;resize();clock.start();loop();} else if(!x.isIntersecting){running=false;} }),{threshold:0.01}).observe(host);
+    new IntersectionObserver(es=>es.forEach(x=>{ if(x.isIntersecting&&!running){running=true;resize();loop();} else if(!x.isIntersecting){running=false;} }),{threshold:0.01}).observe(host);
     resize();
   }
 
@@ -493,7 +468,7 @@
   }
 
   document.addEventListener('DOMContentLoaded',()=>{
-    smooth(); cursor(); blob(); reveals(); horizontal(); zoomScreen(); tilt(); sculpture(); reactions(); counters(); chart(); marquee(); video(); progress(); magnetic(); anchors();
+    smooth(); cursor(); blob(); reveals(); horizontal(); zoomScreen(); tilt(); sculpture(); dots(); reactions(); counters(); chart(); marquee(); video(); progress(); magnetic(); anchors();
     preloader(()=>{ heroIn(); if(hasGSAP) ScrollTrigger.refresh(); });
   });
 })();
