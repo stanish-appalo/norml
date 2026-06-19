@@ -172,6 +172,14 @@
     gsap.utils.toArray('.work-media').forEach(m=>{
       ScrollTrigger.create({trigger:m,start:'top 82%',onEnter:()=>m.classList.add('in')});
     });
+    // story: stagger each work-item's text in
+    gsap.utils.toArray('.work-item').forEach(item=>{
+      const txt=[...item.querySelectorAll('.work-num,h3,p,.hcard__tags')];
+      if(txt.length) gsap.from(txt,{y:34,opacity:0,duration:.9,ease:'power3.out',stagger:.08,scrollTrigger:{trigger:item,start:'top 80%'}});
+    });
+    // stagger service cards as the horizontal section arrives
+    const hc=gsap.utils.toArray('.hcard');
+    if(hc.length) gsap.from(hc,{y:50,opacity:0,duration:.9,ease:'power3.out',stagger:.07,scrollTrigger:{trigger:'.hsec',start:'top 62%'}});
   }
 
   /* ===== Horizontal scroll (services) ===== */
@@ -225,17 +233,22 @@
     if(b) b.addEventListener('click',e=>{e.stopPropagation();v.muted=!v.muted;b.textContent=v.muted?'🔇':'🔊';if(!v.muted)p();});
   }
 
-  /* ===== Scroll-into-screen (zoom) ===== */
+  /* ===== Scroll-into-screen (zoom + content swap) ===== */
   function zoomScreen(){
     if(!hasGSAP) return;
     const sec=document.querySelector('.zoom'); const dev=document.querySelector('.zoom__device');
     if(!sec||!dev) return;
-    const target=()=> Math.max(innerWidth/dev.offsetWidth, innerHeight/dev.offsetHeight)*1.18;
-    const tl=gsap.timeline({scrollTrigger:{trigger:sec,start:'top top',end:'bottom bottom',scrub:1,invalidateOnRefresh:true}});
-    tl.to(dev,{scale:()=>target(),ease:'power1.inOut'},0)
-      .to(['.zoom__frame','.zoom__notch'],{opacity:0,ease:'none'},0)
-      .to('.zoom__lead',{opacity:0,yPercent:-30,ease:'none'},0)
-      .fromTo('.zoom__cap',{opacity:0},{opacity:1,ease:'none'},0.5);
+    const v=sec.querySelector('video');
+    const target=()=> Math.max(innerWidth/dev.offsetWidth, innerHeight/dev.offsetHeight)*1.2;
+    const tl=gsap.timeline({scrollTrigger:{trigger:sec,start:'top top',end:'bottom bottom',scrub:1,invalidateOnRefresh:true,
+      onUpdate:self=>{ if(!v) return; if(self.progress>0.5){ if(!v.paused) v.pause(); } else if(v.paused){ const p=v.play(); if(p&&p.catch)p.catch(()=>{}); } }}});
+    tl.to(dev,{scale:()=>target(),duration:1,ease:'power1.inOut'},0)
+      .to(['.zoom__frame','.zoom__notch'],{opacity:0,duration:.45,ease:'none'},0)
+      .to('.zoom__lead',{opacity:0,yPercent:-30,duration:.5,ease:'none'},0)
+      // halfway: the playing video stops & swaps to an image, carrying you into the next section
+      .to('.zoom__screen video',{opacity:0,duration:.22,ease:'none'},0.5)
+      .fromTo('.zoom__swap',{opacity:0,scale:1.14},{opacity:1,scale:1,duration:.42,ease:'power2.out'},0.5)
+      .fromTo('.zoom__cap',{opacity:0,y:20},{opacity:1,y:0,duration:.3,ease:'none'},0.62);
   }
 
   /* ===== Progress + magnetic + anchors ===== */
@@ -270,6 +283,7 @@
     gsap.set(lines,{yPercent:110});
     gsap.to(lines,{yPercent:0,duration:1.1,ease:'power4.out',stagger:.09});
     gsap.from('[data-hero-fade]',{opacity:0,y:20,duration:1,ease:'power2.out',stagger:.1,delay:.3});
+    gsap.from('.nav',{y:-24,opacity:0,duration:1,ease:'power3.out',delay:.2});
   }
 
   document.addEventListener('DOMContentLoaded',()=>{
