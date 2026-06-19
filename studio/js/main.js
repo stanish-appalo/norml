@@ -127,14 +127,18 @@
 
     const mouse = {x:0,y:0,tx:0,ty:0};
     addEventListener('mousemove',e=>{ mouse.tx=(e.clientX/innerWidth)*2-1; mouse.ty=-((e.clientY/innerHeight)*2-1); });
-    let scrollAmp=0;
-    addEventListener('scroll',()=>{
-      scrollAmp = Math.min(scrollY/innerHeight,1);
-      // carry the jelly into slide 2 ONLY: blur, fully fade & sink across the hero->about seam
-      const p = Math.min(Math.max((scrollY - innerHeight*0.45)/(innerHeight*0.6),0),1);
-      canvas.style.filter = p>0.002 ? 'blur('+(p*28).toFixed(1)+'px)' : 'none';
-      canvas.style.opacity = (1 - p).toFixed(3);
-    }, {passive:true});
+    let scrollAmp=0, jelly=1;
+    function updJelly(){
+      const vh=innerHeight, sy=scrollY;
+      const pOut=Math.min(Math.max((sy-vh*0.5)/(vh*0.6),0),1);              // recedes after slide 1
+      const H=Math.max(document.documentElement.scrollHeight-vh,1);
+      const pIn=Math.min(Math.max((sy-(H-vh*0.9))/(vh*0.7),0),1);           // returns on the last slide
+      const mid=0.5;                                                        // stays subtly visible in between
+      jelly=Math.max(1-pOut*(1-mid),pIn);
+      canvas.style.opacity=jelly.toFixed(3);
+    }
+    addEventListener('scroll',()=>{ scrollAmp = Math.min(scrollY/innerHeight,1); updJelly(); }, {passive:true});
+    updJelly();
 
     function resize(){ cam.aspect=innerWidth/innerHeight; cam.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); place(); }
     resize(); addEventListener('resize',resize);
@@ -142,8 +146,8 @@
     const clock = new T.Clock();
     (function render(){
       requestAnimationFrame(render);
-      if (scrollY > innerHeight*1.8) return;            // pause once well past the hero
-      const dt = clock.getDelta();
+      if (document.hidden || jelly < 0.01) { clock.getDelta(); return; }  // jelly only on 1st & last slides
+      const dt = Math.min(clock.getDelta(), 0.05);
       uniforms.uTime.value += dt;
       mouse.x += (mouse.tx-mouse.x)*0.05; mouse.y += (mouse.ty-mouse.y)*0.05;
       uniforms.uMouse.value.set(mouse.x, mouse.y);
@@ -381,6 +385,76 @@
       el.style.left=(e.clientX)+'px'; el.style.top=(e.clientY)+'px';
       document.body.appendChild(el); setTimeout(()=>el.remove(),1100);
     },{passive:true});
+  }
+
+  /* ===== Ballpit — interactive physics spheres (21st.dev, ported, our palette) ===== */
+  function ballpit(){
+    const cv=document.getElementById('boxgl'); if(!cv||!window.THREE) return;
+    const T=window.THREE, host=cv.parentElement;
+    const renderer=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true,powerPreference:'high-performance'});
+    renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+    if(T.sRGBEncoding) renderer.outputEncoding=T.sRGBEncoding;
+    if(T.ACESFilmicToneMapping){ renderer.toneMapping=T.ACESFilmicToneMapping; renderer.toneMappingExposure=1.0; }
+    const scene=new T.Scene();
+    const cam=new T.PerspectiveCamera(50,1,0.1,100); cam.position.set(0,0,20);
+    let env=null;
+    try{ if(T.RoomEnvironment){ const pm=new T.PMREMGenerator(renderer); env=pm.fromScene(new T.RoomEnvironment(),0.04).texture; scene.environment=env; } }catch(e){}
+    scene.add(new T.AmbientLight(0xffffff,1.3));
+    const plight=new T.PointLight(0xffffff,3,120,1); scene.add(plight);
+
+    const cfg={count:touch?90:150,gravity:0.42,friction:0.99,wallBounce:0.25,maxVel:0.13,minSize:0.4,maxSize:0.95,size0:1.15,maxX:12,maxY:7,maxZ:5,follow:true};
+    const pos=new Float32Array(cfg.count*3), vel=new Float32Array(cfg.count*3), sz=new Float32Array(cfg.count);
+    const center=new T.Vector3();
+    sz[0]=cfg.size0;
+    for(let i=1;i<cfg.count;i++){ const b=3*i; pos[b]=(Math.random()*2-1)*cfg.maxX; pos[b+1]=(Math.random()*2-1)*cfg.maxY; pos[b+2]=(Math.random()*2-1)*cfg.maxZ; sz[i]=cfg.minSize+Math.random()*(cfg.maxSize-cfg.minSize); }
+
+    const geo=new T.SphereGeometry(1,24,24);
+    const mat=new T.MeshPhysicalMaterial({envMap:env,metalness:0.5,roughness:0.26,clearcoat:0.8,clearcoatRoughness:0.25});
+    const mesh=new T.InstancedMesh(geo,mat,cfg.count); mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); scene.add(mesh);
+    const palette=[0xf4f1ea,0xffffff,0xc8ff2e,0xff6a2b,0xe9e4d8,0xf4f1ea].map(c=>new T.Color(c));
+    for(let i=0;i<cfg.count;i++) mesh.setColorAt(i, i===0?new T.Color(0xff6a2b):palette[i%palette.length]);
+    if(mesh.instanceColor) mesh.instanceColor.needsUpdate=true;
+
+    const ray=new T.Raycaster(), plane=new T.Plane(new T.Vector3(0,0,1),0), hit=new T.Vector3(), ptr=new T.Vector2(); let hasPtr=false;
+    addEventListener('pointermove',e=>{ ptr.set((e.clientX/innerWidth)*2-1, -(e.clientY/innerHeight)*2+1); hasPtr=true; });
+
+    const dummy=new T.Object3D(), v=new T.Vector3(), diff=new T.Vector3();
+    function physics(dt){
+      const f=Math.min(dt,0.04)*60;
+      if(cfg.follow){ v.set(pos[0],pos[1],pos[2]).lerp(center,0.12); pos[0]=v.x;pos[1]=v.y;pos[2]=v.z; vel[0]=vel[1]=vel[2]=0; }
+      for(let i=1;i<cfg.count;i++){
+        const b=3*i;
+        vel[b+1]-=0.016*cfg.gravity*sz[i];
+        vel[b]*=cfg.friction; vel[b+1]*=cfg.friction; vel[b+2]*=cfg.friction;
+        const vl=Math.hypot(vel[b],vel[b+1],vel[b+2]); if(vl>cfg.maxVel){ const s=cfg.maxVel/vl; vel[b]*=s;vel[b+1]*=s;vel[b+2]*=s; }
+        pos[b]+=vel[b]*f; pos[b+1]+=vel[b+1]*f; pos[b+2]+=vel[b+2]*f;
+        for(let j=i+1;j<cfg.count;j++){
+          const ob=3*j; diff.set(pos[ob]-pos[b],pos[ob+1]-pos[b+1],pos[ob+2]-pos[b+2]);
+          const d=diff.length()||0.0001, sum=sz[i]+sz[j];
+          if(d<sum){ const o=(sum-d)*0.5; diff.multiplyScalar(1/d); pos[b]-=diff.x*o;pos[b+1]-=diff.y*o;pos[b+2]-=diff.z*o; pos[ob]+=diff.x*o;pos[ob+1]+=diff.y*o;pos[ob+2]+=diff.z*o; }
+        }
+        if(Math.abs(pos[b])+sz[i]>cfg.maxX){ pos[b]=Math.sign(pos[b])*(cfg.maxX-sz[i]); vel[b]*=-cfg.wallBounce; }
+        if(pos[b+1]-sz[i]<-cfg.maxY){ pos[b+1]=-cfg.maxY+sz[i]; vel[b+1]*=-cfg.wallBounce; }
+        if(pos[b+1]+sz[i]>cfg.maxY){ pos[b+1]=cfg.maxY-sz[i]; vel[b+1]*=-cfg.wallBounce; }
+        if(Math.abs(pos[b+2])+sz[i]>cfg.maxZ){ pos[b+2]=Math.sign(pos[b+2])*(cfg.maxZ-sz[i]); vel[b+2]*=-cfg.wallBounce; }
+      }
+    }
+    function sync(){
+      for(let i=0;i<cfg.count;i++){ const b=3*i; dummy.position.set(pos[b],pos[b+1],pos[b+2]); dummy.scale.setScalar(sz[i]); dummy.updateMatrix(); mesh.setMatrixAt(i,dummy.matrix); }
+      mesh.instanceMatrix.needsUpdate=true; plight.position.set(pos[0],pos[1],pos[2]);
+    }
+    const clock=new T.Clock(); let running=false;
+    function frameDims(){ const fovr=cam.fov*Math.PI/180, wH=2*Math.tan(fovr/2)*cam.position.z, wW=wH*cam.aspect; cfg.maxX=wW/2; cfg.maxY=wH/2; cfg.maxZ=Math.max(wW/4,3); }
+    function resize(){ const r=host.getBoundingClientRect(); if(!r.width)return; renderer.setSize(r.width,r.height,false); cam.aspect=r.width/r.height; cam.updateProjectionMatrix(); frameDims(); }
+    function loop(){
+      if(!running) return;
+      const dt=clock.getDelta();
+      if(cfg.follow && hasPtr){ ray.setFromCamera(ptr,cam); ray.ray.intersectPlane(plane,hit); if(hit) center.copy(hit); }
+      physics(dt); sync(); renderer.render(scene,cam); requestAnimationFrame(loop);
+    }
+    addEventListener('resize',resize);
+    new IntersectionObserver(es=>es.forEach(x=>{ if(x.isIntersecting&&!running){running=true;resize();clock.start();loop();} else if(!x.isIntersecting){running=false;} }),{threshold:0.01}).observe(host);
+    resize();
   }
 
   /* ===== Progress + magnetic + anchors ===== */
